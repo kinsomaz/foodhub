@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
-class EmailVerificationView extends StatefulWidget {
-  const EmailVerificationView({super.key});
+class VerificationView extends StatefulWidget {
+  const VerificationView({super.key});
 
   @override
-  State<EmailVerificationView> createState() => _EmailVerificationViewState();
+  State<VerificationView> createState() => _VerificationViewState();
 }
 
-class _EmailVerificationViewState extends State<EmailVerificationView> {
+class _VerificationViewState extends State<VerificationView> {
   late List<FocusNode> _focusNodes;
   late List<TextEditingController> _controllers;
-  int _currentBox = 0;
 
   @override
   void initState() {

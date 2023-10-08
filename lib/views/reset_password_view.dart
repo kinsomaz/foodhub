@@ -1,24 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
-class PhoneRegistrationView extends StatefulWidget {
-  const PhoneRegistrationView({super.key});
+class ResetPasswordView extends StatefulWidget {
+  const ResetPasswordView({super.key});
 
   @override
-  State<PhoneRegistrationView> createState() => _PhoneRegistrationViewState();
+  State<ResetPasswordView> createState() => _ResetPasswordViewState();
 }
 
-class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
-  late final TextEditingController _phoneNumber;
-  final FocusNode _focusNodePhoneNumber = FocusNode();
+class _ResetPasswordViewState extends State<ResetPasswordView> {
+  late final TextEditingController _password;
+  final FocusNode _focusNodePassword = FocusNode();
 
   @override
   void initState() {
-    _phoneNumber = TextEditingController();
-    _focusNodePhoneNumber.addListener(() {
+    _password = TextEditingController();
+    _focusNodePassword.addListener(() {
       setState(() {});
     });
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _password.dispose();
+    _focusNodePassword.dispose();
+    super.dispose();
   }
 
   @override
@@ -74,7 +80,7 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                     width: screenWidth * 0.75,
                     height: screenHeight * 0.06,
                     child: Text(
-                      'Registration',
+                      'Resset Password',
                       style: TextStyle(
                         fontSize: screenWidth * 0.09,
                         fontFamily: 'SofiaPro',
@@ -93,7 +99,7 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                     width: screenWidth * 0.8,
                     height: screenHeight * 0.03,
                     child: Text(
-                      'Enter your phone number to verify',
+                      'Please enter your email address to',
                       style: TextStyle(
                         fontSize: screenWidth * 0.038,
                         fontFamily: 'SofiaPro',
@@ -111,7 +117,7 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                     width: screenWidth * 0.8,
                     height: screenHeight * 0.03,
                     child: Text(
-                      'your account',
+                      'request a password reset',
                       style: TextStyle(
                         fontSize: screenWidth * 0.038,
                         fontFamily: 'SofiaPro',
@@ -129,29 +135,35 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                     top: screenHeight * 0.01,
                   ),
                   child: Container(
-                      height: screenHeight * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                          color: _focusNodePhoneNumber.hasFocus
-                              ? const Color(0xFFFE724C)
-                              : const Color(0xFFEEEEEE),
-                        ),
+                    height: screenHeight * 0.07,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(
+                        color: _focusNodePassword.hasFocus
+                            ? const Color(0xFFFE724C)
+                            : const Color(0xFFEEEEEE),
                       ),
-                      child: InternationalPhoneNumberInput(
-                        focusNode: _focusNodePhoneNumber,
-                        initialValue: PhoneNumber(
-                          isoCode: 'NG',
+                    ),
+                    child: TextField(
+                      controller: _password,
+                      focusNode: _focusNodePassword,
+                      keyboardType: TextInputType.visiblePassword,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        hintText: 'Password',
+                        hintStyle: TextStyle(
+                          fontSize: screenWidth * 0.045,
+                          fontFamily: 'SofiaPro',
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFFC4C4C4),
                         ),
-                        onInputChanged: (PhoneNumber number) {},
-                        selectorConfig: const SelectorConfig(
-                            selectorType: PhoneInputSelectorType.DROPDOWN,
-                            trailingSpace: false,
-                            useEmoji: true),
-                        inputDecoration: const InputDecoration(
-                          border: InputBorder.none,
-                        ),
-                      )),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(10.0),
+                      ),
+                      cursorColor: const Color(0xFFFE724C),
+                    ),
+                  ),
                 ),
                 SizedBox(height: screenHeight * 0.02),
                 Center(
@@ -170,7 +182,7 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                       child: TextButton(
                         onPressed: () {},
                         child: Text(
-                          'SEND',
+                          'SEND NEW PASSWORDS',
                           style: TextStyle(
                             fontSize: screenWidth * 0.04,
                             fontFamily: 'SofiaPro',

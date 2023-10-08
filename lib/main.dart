@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:foodhub/views/Registration/phone_registration_view.dart';
 import 'package:foodhub/views/login_view.dart';
+import 'package:foodhub/views/reset_password_view.dart';
 import 'package:foodhub/views/sign_up_view.dart';
-import 'package:foodhub/views/verification/email_verification_view.dart';
+import 'package:foodhub/views/verification/verification_view.dart';
 import 'package:foodhub/views/welcome_view.dart';
 
 void main() {
@@ -35,6 +37,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return EmailVerificationView();
+    return VerificationView();
   }
 }
