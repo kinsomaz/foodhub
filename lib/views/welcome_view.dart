@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_event.dart';
 
 class WelcomeView extends StatelessWidget {
   const WelcomeView({super.key});
@@ -163,7 +166,11 @@ class WelcomeView extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 TextButton.icon(
-                  onPressed: () {},
+                  onPressed: () async {
+                    context.read<FoodHubBloc>().add(
+                          AuthEventGoogleSignIn(),
+                        );
+                  },
                   icon: Icon(
                     Icons.face,
                     size: screenWidth * 0.09,

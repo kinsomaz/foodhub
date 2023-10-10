@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_event.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -264,7 +267,18 @@ class _SignUpViewState extends State<SignUpView> {
                         width: screenWidth * 0.7,
                         height: screenHeight * 0.08,
                         child: TextButton(
-                          onPressed: () {},
+                          onPressed: () async {
+                            final name = _name.text;
+                            final email = _email.text;
+                            final password = _password.text;
+                            context.read<FoodHubBloc>().add(
+                                  AuthEventRegister(
+                                    name: name,
+                                    email: email,
+                                    password: password,
+                                  ),
+                                );
+                          },
                           child: Text(
                             'SIGN UP',
                             style: TextStyle(

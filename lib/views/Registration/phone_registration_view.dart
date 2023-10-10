@@ -9,12 +9,10 @@ class PhoneRegistrationView extends StatefulWidget {
 }
 
 class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
-  late final TextEditingController _phoneNumber;
   final FocusNode _focusNodePhoneNumber = FocusNode();
 
   @override
   void initState() {
-    _phoneNumber = TextEditingController();
     _focusNodePhoneNumber.addListener(() {
       setState(() {});
     });
