@@ -1,11 +1,22 @@
+import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/firebase_options.dart';
 import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
 import 'package:foodhub/services/auth/auth_user.dart';
+import 'package:foodhub/services/bloc/food_hub_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_event.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
+  @override
+  int? resendToken;
+
+  @override
+  String? verificationId;
+
   @override
   Future<AuthUser> createUser({
     required String email,
@@ -87,20 +98,11 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> sendEmailVerification() async {
-    final user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      await user.sendEmailVerification();
-    } else {
-      throw UserNotLoggedInAuthException();
-    }
-  }
-
-  @override
   Future<void> initialize() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    FirebaseFunctions.instance.useFunctionsEmulator("localhost", 8329);
   }
 
   @override
@@ -119,5 +121,68 @@ class FirebaseAuthProvider implements AuthProvider {
     } catch (_) {
       throw GenericAuthException();
     }
+  }
+
+  @override
+  Future<void> updateIsEmailVerified() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      await user!.updateEmail(user.email!);
+    } catch (e) {
+      throw UpdateIsEmailVerifiedException();
+    }
+  }
+
+  @override
+  Future<void> verifyPhoneNumber({
+    required phoneNumber,
+    required BuildContext context,
+  }) async {
+    await FirebaseAuth.instance.verifyPhoneNumber(
+      phoneNumber: phoneNumber,
+      verificationCompleted: (PhoneAuthCredential credential) async {
+        try {
+          await FirebaseAuth.instance.currentUser!
+              .linkWithCredential(credential);
+        } on FirebaseAuthException catch (e) {
+          switch (e.code) {
+            case "provider-already-linked":
+              throw PhoneAlreadyLinkedAuthException();
+            case "invalid-credential":
+              throw InvalidCredentialAuthException();
+            case "credential-already-in-use":
+              throw CredentialAlreadyInUseAuthException();
+            default:
+              throw GenericAuthException();
+          }
+        }
+        // ignore: use_build_context_synchronously
+        context.read<FoodHubBloc>().add(
+              const AuthEventVerifyPhoneCode(
+                codeOne: null,
+                codeTwo: null,
+                codeThree: null,
+                codeFour: null,
+                codeFive: null,
+                codeSix: null,
+              ),
+            );
+      },
+      verificationFailed: (FirebaseAuthException e) {
+        if (e.code == 'invalid-phone-number') {
+          throw InvalidPhoneNumberAuthException();
+        } else {
+          throw SMSQuotaExceededAuthException();
+        }
+      },
+      codeSent: (String verificationId, int? resendToken) {
+        this.verificationId = verificationId;
+        this.resendToken = resendToken;
+      },
+      timeout: const Duration(seconds: 60),
+      codeAutoRetrievalTimeout: (String verificationId) {
+        this.verificationId = verificationId;
+      },
+    );
   }
 }

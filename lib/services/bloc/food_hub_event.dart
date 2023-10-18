@@ -15,8 +15,44 @@ class AuthEventLogIn extends FoodHubEvent {
   const AuthEventLogIn(this.email, this.password);
 }
 
-class AuthEventSendEmailVerification extends FoodHubEvent {
-  const AuthEventSendEmailVerification();
+class AuthEventVerifyEmailCode extends FoodHubEvent {
+  final String codeOne;
+  final String codeTwo;
+  final String codeThree;
+  final String codeFour;
+
+  const AuthEventVerifyEmailCode({
+    required this.codeOne,
+    required this.codeTwo,
+    required this.codeThree,
+    required this.codeFour,
+  });
+}
+
+class AuthEventVerifyPhoneCode extends FoodHubEvent {
+  final String? codeOne;
+  final String? codeTwo;
+  final String? codeThree;
+  final String? codeFour;
+  final String? codeFive;
+  final String? codeSix;
+
+  const AuthEventVerifyPhoneCode({
+    required this.codeOne,
+    required this.codeTwo,
+    required this.codeThree,
+    required this.codeFour,
+    required this.codeFive,
+    required this.codeSix,
+  });
+}
+
+class AuthEventVerifyPhone extends FoodHubEvent {
+  final String phoneNumber;
+
+  const AuthEventVerifyPhone({
+    required this.phoneNumber,
+  });
 }
 
 class AuthEventRegister extends FoodHubEvent {
@@ -36,6 +72,10 @@ class AuthEventGoogleSignIn extends FoodHubEvent {
 
 class AuthEventShouldRegister extends FoodHubEvent {
   const AuthEventShouldRegister();
+}
+
+class AuthEventShouldSignIn extends FoodHubEvent {
+  const AuthEventShouldSignIn();
 }
 
 class AuthEventForgotPassword extends FoodHubEvent {

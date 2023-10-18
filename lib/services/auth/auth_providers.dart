@@ -1,6 +1,9 @@
+import 'package:flutter/material.dart';
 import 'package:foodhub/services/auth/auth_user.dart';
 
 abstract class AuthProvider {
+  String? verificationId;
+  int? resendToken;
   Future<void> initialize();
   AuthUser? get currentUser;
   Future<AuthUser> logIn({
@@ -12,6 +15,10 @@ abstract class AuthProvider {
     required String password,
   });
   Future<void> logOut();
-  Future<void> sendEmailVerification();
   Future<void> sendPasswordReset({required String toEmail});
+  Future<void> updateIsEmailVerified();
+  Future<void> verifyPhoneNumber({
+    required phoneNumber,
+    required BuildContext context,
+  });
 }

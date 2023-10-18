@@ -1,35 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/utilities/dialogs/error_dialog.dart';
-import 'package:foodhub/utilities/dialogs/password_reset_email_sent_dialog.dart';
+import 'package:foodhub/views/verification/verification_exception.dart';
 
-class ResetPasswordView extends StatefulWidget {
-  const ResetPasswordView({super.key});
+class EmailVerificationView extends StatefulWidget {
+  const EmailVerificationView({super.key});
 
   @override
-  State<ResetPasswordView> createState() => _ResetPasswordViewState();
+  State<EmailVerificationView> createState() => _EmailVerificationViewState();
 }
 
-class _ResetPasswordViewState extends State<ResetPasswordView> {
-  late final TextEditingController _email;
-  final FocusNode _focusNodePassword = FocusNode();
+class _EmailVerificationViewState extends State<EmailVerificationView> {
+  late List<FocusNode> _focusNodes;
+  late List<TextEditingController> _controllers;
 
   @override
   void initState() {
-    _email = TextEditingController();
-    _focusNodePassword.addListener(() {
-      setState(() {});
-    });
+    _focusNodes = List.generate(4, (index) => FocusNode());
+    _controllers = List.generate(4, (index) => TextEditingController());
     super.initState();
   }
 
   @override
   void dispose() {
-    _email.dispose();
-    _focusNodePassword.dispose();
+    for (var node in _focusNodes) {
+      node.dispose();
+    }
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
     super.dispose();
   }
 
@@ -39,16 +42,12 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return BlocListener<FoodHubBloc, FoodHubState>(
-      listener: (context, state) async {
-        if (state is AuthStateForgotPassword) {
-          if (state.hasSentEmail) {
-            _email.clear();
-            await showPasswordResetSentDialog(context);
-          } else if (state.exception != null) {
-            await showErrorDialog(
-              context,
-              'We could not process your request. Please make sure you are a registered user',
-            );
+      listener: (context, state) {
+        if (state is AuthStateEmailNeedsVerification) {
+          if (state.exception is InvalidVerifiationCodeException) {
+            showErrorDialog(context, 'Invalid verification Code');
+          } else if (state.exception is UpdateIsEmailVerifiedException) {
+            showErrorDialog(context, 'Could not verify email');
           }
         }
       },
@@ -100,7 +99,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.75,
                       height: screenHeight * 0.06,
                       child: Text(
-                        'Resset Password',
+                        'Verification Code',
                         style: TextStyle(
                           fontSize: screenWidth * 0.09,
                           fontFamily: 'SofiaPro',
@@ -119,7 +118,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.03,
                       child: Text(
-                        'Please enter your email address to',
+                        'Please type the verification code sent to',
                         style: TextStyle(
                           fontSize: screenWidth * 0.038,
                           fontFamily: 'SofiaPro',
@@ -137,7 +136,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.03,
                       child: Text(
-                        'request a password reset',
+                        '',
                         style: TextStyle(
                           fontSize: screenWidth * 0.038,
                           fontFamily: 'SofiaPro',
@@ -152,80 +151,89 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                     padding: EdgeInsets.only(
                       left: screenWidth * 0.05,
                       right: screenWidth * 0.05,
-                      top: screenHeight * 0.01,
                     ),
-                    child: Container(
-                      height: screenHeight * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                          color: _focusNodePassword.hasFocus
-                              ? const Color(0xFFFE724C)
-                              : const Color(0xFFEEEEEE),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _email,
-                        focusNode: _focusNodePassword,
-                        keyboardType: TextInputType.emailAddress,
-                        enableSuggestions: true,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          hintStyle: TextStyle(
-                            fontSize: screenWidth * 0.045,
-                            fontFamily: 'SofiaPro',
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFFC4C4C4),
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(10.0),
-                        ),
-                        cursorColor: const Color(0xFFFE724C),
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: <Widget>[
+                        for (var i = 0; i < 4; i++) buildCodeTextField(i),
+                      ],
                     ),
                   ),
                   SizedBox(height: screenHeight * 0.02),
-                  Center(
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        top: screenHeight * 0.030,
-                        bottom: screenHeight * 0.02,
-                      ),
-                      child: Container(
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(30.0),
-                            color: const Color(0xFFFE724C),
-                            border: Border.all(color: const Color(0xFFFFFFFF))),
-                        width: screenWidth * 0.7,
-                        height: screenHeight * 0.08,
-                        child: TextButton(
-                          onPressed: () {
-                            final email = _email.text;
-                            context.read<FoodHubBloc>().add(
-                                  AuthEventForgotPassword(
-                                    email: email,
-                                  ),
-                                );
-                          },
-                          child: Text(
-                            'SEND NEW PASSWORDS',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w600,
-                              color: const Color(0xFFFFFFFF),
-                            ),
-                          ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        "I don't receive a code!",
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.04,
+                          fontFamily: 'SofiaPro',
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF5B5B5E),
                         ),
                       ),
-                    ),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Please resend',
+                          style: TextStyle(
+                              fontSize: screenWidth * 0.04,
+                              fontFamily: 'SofiaPro',
+                              fontWeight: FontWeight.w500,
+                              color: const Color.fromRGBO(254, 114, 76, 1),
+                              decorationColor: Colors.white),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             )
           ],
         ),
+      ),
+    );
+  }
+
+  Widget buildCodeTextField(int index) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    return Container(
+      width: screenWidth * 0.13,
+      height: screenHeight * 0.07,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10.0),
+        border: Border.all(
+          color: _focusNodes[index].hasFocus
+              ? const Color(0xFFFE724C)
+              : const Color(0xFFEEEEEE),
+        ),
+      ),
+      child: TextField(
+        controller: _controllers[index],
+        focusNode: _focusNodes[index],
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          isDense: true,
+        ),
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        onChanged: (value) async {
+          if (value.length == 1 && index < 3) {
+            _focusNodes[index].unfocus();
+            _focusNodes[index + 1].requestFocus();
+          }
+          if (value.length == 1 && index == 3) {
+            context.read<FoodHubBloc>().add(
+                  AuthEventVerifyEmailCode(
+                    codeOne: _controllers[0].text,
+                    codeTwo: _controllers[1].text,
+                    codeThree: _controllers[2].text,
+                    codeFour: _controllers[3].text,
+                  ),
+                );
+          }
+        },
       ),
     );
   }

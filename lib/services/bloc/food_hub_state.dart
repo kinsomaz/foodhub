@@ -1,6 +1,8 @@
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:foodhub/services/auth/auth_user.dart';
 
+@immutable
 abstract class FoodHubState {
   final bool isLoading;
   final String? loadingText;
@@ -19,6 +21,24 @@ class AuthStateRegistering extends FoodHubState {
   final Exception? exception;
   const AuthStateRegistering({required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
+}
+
+class AuthStateSigningIn extends FoodHubState {
+  final Exception? exception;
+
+  const AuthStateSigningIn({
+    required this.exception,
+    required bool isLoading,
+    String? loadingText,
+  }) : super(isLoading: isLoading, loadingText: loadingText);
+}
+
+class AuthStatePhoneRegistration extends FoodHubState {
+  final Exception? exception;
+  const AuthStatePhoneRegistration({
+    required this.exception,
+    required bool isLoading,
+  }) : super(isLoading: isLoading);
 }
 
 class AuthStateForgotPassword extends FoodHubState {
@@ -40,8 +60,17 @@ class AuthStateLoggedIn extends FoodHubState {
   }) : super(isLoading: isLoading);
 }
 
-class AuthStateNeedsVerification extends FoodHubState {
-  const AuthStateNeedsVerification({required bool isLoading})
+class AuthStateEmailNeedsVerification extends FoodHubState {
+  final Exception? exception;
+  const AuthStateEmailNeedsVerification(
+      {required this.exception, required bool isLoading})
+      : super(isLoading: isLoading);
+}
+
+class AuthStatePhoneNeedsVerification extends FoodHubState {
+  final Exception? exception;
+  const AuthStatePhoneNeedsVerification(
+      {required this.exception, required bool isLoading})
       : super(isLoading: isLoading);
 }
 

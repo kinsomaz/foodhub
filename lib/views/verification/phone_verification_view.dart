@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_bloc.dart';
+import 'package:foodhub/services/bloc/food_hub_event.dart';
 
-class VerificationView extends StatefulWidget {
-  const VerificationView({super.key});
+class PhoneVerificationView extends StatefulWidget {
+  const PhoneVerificationView({super.key});
 
   @override
-  State<VerificationView> createState() => _VerificationViewState();
+  State<PhoneVerificationView> createState() => _PhoneVerificationViewState();
 }
 
-class _VerificationViewState extends State<VerificationView> {
+class _PhoneVerificationViewState extends State<PhoneVerificationView> {
   late List<FocusNode> _focusNodes;
   late List<TextEditingController> _controllers;
 
   @override
   void initState() {
-    _focusNodes = List.generate(4, (index) => FocusNode());
-    _controllers = List.generate(4, (index) => TextEditingController());
+    _focusNodes = List.generate(6, (index) => FocusNode());
+    _controllers = List.generate(6, (index) => TextEditingController());
     super.initState();
   }
 
@@ -119,7 +122,7 @@ class _VerificationViewState extends State<VerificationView> {
                     width: screenWidth * 0.8,
                     height: screenHeight * 0.03,
                     child: Text(
-                      '',
+                      'your phone number',
                       style: TextStyle(
                         fontSize: screenWidth * 0.038,
                         fontFamily: 'SofiaPro',
@@ -138,7 +141,7 @@ class _VerificationViewState extends State<VerificationView> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: <Widget>[
-                      for (var i = 0; i < 4; i++) buildCodeTextField(i),
+                      for (var i = 0; i < 6; i++) buildCodeTextField(i),
                     ],
                   ),
                 ),
@@ -181,8 +184,8 @@ class _VerificationViewState extends State<VerificationView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      width: screenWidth * 0.13,
-      height: screenHeight * 0.07,
+      width: screenWidth * 0.08,
+      height: screenHeight * 0.04,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(
@@ -200,10 +203,22 @@ class _VerificationViewState extends State<VerificationView> {
         ),
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
-        onChanged: (value) {
-          if (value.length == 1 && index < 3) {
+        onChanged: (value) async {
+          if (value.length == 1 && index < 5) {
             _focusNodes[index].unfocus();
             _focusNodes[index + 1].requestFocus();
+          }
+          if (value.length == 1 && index == 5) {
+            context.read<FoodHubBloc>().add(
+                  AuthEventVerifyPhoneCode(
+                    codeOne: _controllers[0].text,
+                    codeTwo: _controllers[1].text,
+                    codeThree: _controllers[2].text,
+                    codeFour: _controllers[3].text,
+                    codeFive: _controllers[4].text,
+                    codeSix: _controllers[5].text,
+                  ),
+                );
           }
         },
       ),

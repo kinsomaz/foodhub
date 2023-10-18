@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/utilities/dialogs/error_dialog.dart';
-import 'package:foodhub/utilities/dialogs/password_reset_email_sent_dialog.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
-class ResetPasswordView extends StatefulWidget {
-  const ResetPasswordView({super.key});
+class PhoneRegistrationView extends StatefulWidget {
+  const PhoneRegistrationView({super.key});
 
   @override
-  State<ResetPasswordView> createState() => _ResetPasswordViewState();
+  State<PhoneRegistrationView> createState() => _PhoneRegistrationViewState();
 }
 
-class _ResetPasswordViewState extends State<ResetPasswordView> {
-  late final TextEditingController _email;
-  final FocusNode _focusNodePassword = FocusNode();
+class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
+  late final TextEditingController _phone;
+  final FocusNode _focusNodePhoneNumber = FocusNode();
 
   @override
   void initState() {
-    _email = TextEditingController();
-    _focusNodePassword.addListener(() {
+    _phone = TextEditingController();
+    _focusNodePhoneNumber.addListener(() {
       setState(() {});
     });
     super.initState();
@@ -28,8 +29,8 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
 
   @override
   void dispose() {
-    _email.dispose();
-    _focusNodePassword.dispose();
+    _phone.dispose();
+    _focusNodePhoneNumber.dispose();
     super.dispose();
   }
 
@@ -39,16 +40,22 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
     double screenHeight = MediaQuery.of(context).size.height;
 
     return BlocListener<FoodHubBloc, FoodHubState>(
-      listener: (context, state) async {
-        if (state is AuthStateForgotPassword) {
-          if (state.hasSentEmail) {
-            _email.clear();
-            await showPasswordResetSentDialog(context);
-          } else if (state.exception != null) {
-            await showErrorDialog(
-              context,
-              'We could not process your request. Please make sure you are a registered user',
-            );
+      listener: (context, state) {
+        if (state is AuthStatePhoneRegistration) {
+          if (state.exception is PhoneAlreadyLinkedAuthException) {
+            showErrorDialog(
+                context, 'Phone number has already been linked with this user');
+          } else if (state.exception is InvalidCredentialAuthException) {
+            showErrorDialog(context, "The provider's credential is not valid");
+          } else if (state.exception is CredentialAlreadyInUseAuthException) {
+            showErrorDialog(context,
+                'Phone number has already been linked with another user');
+          } else if (state.exception is InvalidPhoneNumberAuthException) {
+            showErrorDialog(context, 'Enter a valid Phone Number');
+          } else if (state.exception is SMSQuotaExceededAuthException) {
+            showErrorDialog(context, 'SMS Quota Exceeded');
+          } else if (state.exception is GenericAuthException) {
+            showErrorDialog(context, 'Check your internet connection');
           }
         }
       },
@@ -100,7 +107,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.75,
                       height: screenHeight * 0.06,
                       child: Text(
-                        'Resset Password',
+                        'Registration',
                         style: TextStyle(
                           fontSize: screenWidth * 0.09,
                           fontFamily: 'SofiaPro',
@@ -119,7 +126,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.03,
                       child: Text(
-                        'Please enter your email address to',
+                        'Enter your phone number to verify',
                         style: TextStyle(
                           fontSize: screenWidth * 0.038,
                           fontFamily: 'SofiaPro',
@@ -137,7 +144,7 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       width: screenWidth * 0.8,
                       height: screenHeight * 0.03,
                       child: Text(
-                        'request a password reset',
+                        'your account',
                         style: TextStyle(
                           fontSize: screenWidth * 0.038,
                           fontFamily: 'SofiaPro',
@@ -155,35 +162,30 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                       top: screenHeight * 0.01,
                     ),
                     child: Container(
-                      height: screenHeight * 0.07,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10.0),
-                        border: Border.all(
-                          color: _focusNodePassword.hasFocus
-                              ? const Color(0xFFFE724C)
-                              : const Color(0xFFEEEEEE),
-                        ),
-                      ),
-                      child: TextField(
-                        controller: _email,
-                        focusNode: _focusNodePassword,
-                        keyboardType: TextInputType.emailAddress,
-                        enableSuggestions: true,
-                        autocorrect: false,
-                        decoration: InputDecoration(
-                          hintText: 'Email',
-                          hintStyle: TextStyle(
-                            fontSize: screenWidth * 0.045,
-                            fontFamily: 'SofiaPro',
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFFC4C4C4),
+                        height: screenHeight * 0.07,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          border: Border.all(
+                            color: _focusNodePhoneNumber.hasFocus
+                                ? const Color(0xFFFE724C)
+                                : const Color(0xFFEEEEEE),
                           ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.all(10.0),
                         ),
-                        cursorColor: const Color(0xFFFE724C),
-                      ),
-                    ),
+                        child: InternationalPhoneNumberInput(
+                          textFieldController: _phone,
+                          focusNode: _focusNodePhoneNumber,
+                          initialValue: PhoneNumber(
+                            isoCode: 'NG',
+                          ),
+                          onInputChanged: (PhoneNumber number) {},
+                          selectorConfig: const SelectorConfig(
+                              selectorType: PhoneInputSelectorType.DROPDOWN,
+                              trailingSpace: false,
+                              useEmoji: true),
+                          inputDecoration: const InputDecoration(
+                            border: InputBorder.none,
+                          ),
+                        )),
                   ),
                   SizedBox(height: screenHeight * 0.02),
                   Center(
@@ -201,15 +203,15 @@ class _ResetPasswordViewState extends State<ResetPasswordView> {
                         height: screenHeight * 0.08,
                         child: TextButton(
                           onPressed: () {
-                            final email = _email.text;
-                            context.read<FoodHubBloc>().add(
-                                  AuthEventForgotPassword(
-                                    email: email,
-                                  ),
-                                );
+                            final phoneNumber = _phone.text;
+                            context
+                                .read<FoodHubBloc>()
+                                .add(AuthEventVerifyPhone(
+                                  phoneNumber: phoneNumber,
+                                ));
                           },
                           child: Text(
-                            'SEND NEW PASSWORDS',
+                            'SEND',
                             style: TextStyle(
                               fontSize: screenWidth * 0.04,
                               fontFamily: 'SofiaPro',
