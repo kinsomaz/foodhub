@@ -1,13 +1,14 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodhub/Google/google_sign_in.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
-import 'package:foodhub/services/auth/auth_user.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/services/cloud/cloud_storage.dart';
+import 'package:foodhub/services/cloud/cloud_storage_constants.dart';
 import 'package:foodhub/views/verification/send_verification_email_code.dart';
 import 'package:foodhub/views/verification/email_verification_code_generator.dart';
 import 'package:foodhub/views/verification/verification_exception.dart';
@@ -83,24 +84,35 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           const AuthStateEmailNeedsVerification(
             isLoading: true,
             exception: null,
+            isSuccessful: null,
           ),
         );
         try {
           final user = provider.currentUser;
           final originalVerificationCode =
-              await storage.readVerificationCode(ownerUserId: user!.id);
+              await storage.readVerificationCode(ownerUserId: user!.uid);
           if (verificationCode == originalVerificationCode) {
             final HttpsCallable setVerifiedEmail =
-                FirebaseFunctions.instance.httpsCallableFromUrl(
-              'http://localhost:5000/foodhub-363a9/us-central1/setVerifiedEmail',
-            );
+                FirebaseFunctions.instance.httpsCallable('setVerifiedEmail');
             try {
-              await setVerifiedEmail.call();
+              final result = await setVerifiedEmail();
+              final Map<String, dynamic> data =
+                  Map<String, dynamic>.from(result.data);
+              if (data.containsKey('success') && data['success'] == true) {
+                emit(
+                  const AuthStateEmailNeedsVerification(
+                    isLoading: false,
+                    exception: null,
+                    isSuccessful: true,
+                  ),
+                );
+              }
             } on FirebaseException catch (e) {
               emit(
                 AuthStateEmailNeedsVerification(
                   isLoading: false,
                   exception: e,
+                  isSuccessful: null,
                 ),
               );
             }
@@ -108,6 +120,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               const AuthStateEmailNeedsVerification(
                 isLoading: false,
                 exception: null,
+                isSuccessful: null,
               ),
             );
             emit(
@@ -122,6 +135,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               AuthStateEmailNeedsVerification(
                 isLoading: false,
                 exception: error,
+                isSuccessful: null,
               ),
             );
           }
@@ -130,6 +144,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             AuthStateEmailNeedsVerification(
               isLoading: false,
               exception: e,
+              isSuccessful: null,
             ),
           );
         }
@@ -170,23 +185,11 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
     // user enter the code they received on their phone number and then we verify
     on<AuthEventVerifyPhoneCode>(
       (event, emit) async {
-        final user = provider.currentUser;
+        User? user = provider.currentUser;
         if (user != null) {
           final verificationCode =
               "${event.codeOne}${event.codeTwo}${event.codeThree}${event.codeFour}${event.codeFive}${event.codeSix}";
           if (event.codeOne == null && event.codeTwo == null) {
-            emit(
-              const AuthStatePhoneNeedsVerification(
-                exception: null,
-                isLoading: true,
-              ),
-            );
-            emit(
-              const AuthStatePhoneNeedsVerification(
-                exception: null,
-                isLoading: false,
-              ),
-            );
             emit(
               AuthStateLoggedIn(
                 user: user,
@@ -201,15 +204,21 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               ),
             );
             final verificationId = provider.verificationId;
-            final resendToken = provider.resendToken;
             if (verificationId != null) {
               PhoneAuthCredential credential = PhoneAuthProvider.credential(
                   verificationId: verificationId, smsCode: verificationCode);
               await FirebaseAuth.instance.currentUser!
                   .linkWithCredential(credential);
+              final user = provider.currentUser;
+              final profileRef = storage.profileRef;
+              if (profileRef != null) {
+                profileRef.update({
+                  phoneFieldName: user!.phoneNumber,
+                });
+              }
               emit(
                 AuthStateLoggedIn(
-                  user: user,
+                  user: user!,
                   isLoading: false,
                 ),
               );
@@ -237,10 +246,11 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           );
 
           //store users profile in cloud
-          await storage.createNewProfile(
-            ownerUserId: user.id,
+          await storage.createOrUpdateProfile(
+            ownerUserId: user.uid,
             name: name,
             email: email,
+            phone: '',
           );
 
           //send verificationCode to user email and store in cloud
@@ -248,7 +258,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           await sendVerificationEmailCode(
               email: email, verificationCode: verificationCode);
           await storage.storeVerificationCode(
-            ownerUserId: user.id,
+            ownerUserId: user.uid,
             verificationCode: verificationCode,
           );
           emit(
@@ -261,6 +271,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             const AuthStateEmailNeedsVerification(
               isLoading: false,
               exception: null,
+              isSuccessful: null,
             ),
           );
         } on Exception catch (e) {
@@ -283,27 +294,26 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               loadingText: 'Please wait while I sign you in'),
         );
         try {
-          final User? user = await googleSignIn();
-          final authUser = AuthUser.fromFirebase(user!);
-
-          final name = user.displayName;
-          final email = user.email;
-          final uid = user.uid;
-
-          await storage.createNewProfile(
-            ownerUserId: uid,
-            name: name ?? '',
-            email: email ?? '',
-          );
+          User? user = await googleSignIn();
           emit(
             const AuthStateLoggedOut(
               exception: null,
               isLoading: false,
             ),
           );
+          final name = user!.displayName;
+          final email = user.email;
+          final uid = user.uid;
+
+          await storage.createOrUpdateProfile(
+            ownerUserId: uid,
+            name: name ?? '',
+            email: email ?? '',
+            phone: '',
+          );
           emit(
-            AuthStateLoggedIn(
-              user: authUser,
+            const AuthStatePhoneRegistration(
+              exception: null,
               isLoading: false,
             ),
           );
@@ -329,11 +339,19 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               isLoading: false,
             ),
           );
-        } else if (!user.isEmailVerified) {
+        } else if (!user.emailVerified) {
           emit(
             const AuthStateEmailNeedsVerification(
               isLoading: false,
               exception: null,
+              isSuccessful: null,
+            ),
+          );
+        } else if (user.phoneNumber == null) {
+          emit(
+            const AuthStatePhoneRegistration(
+              exception: null,
+              isLoading: false,
             ),
           );
         } else {
@@ -363,7 +381,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             email: email,
             password: password,
           );
-          if (!user.isEmailVerified) {
+          if (!user.emailVerified) {
             emit(
               const AuthStateSigningIn(
                 exception: null,
@@ -374,6 +392,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               const AuthStateEmailNeedsVerification(
                 isLoading: false,
                 exception: null,
+                isSuccessful: null,
               ),
             );
           } else {

@@ -5,19 +5,25 @@ import 'package:foodhub/services/cloud/cloud_storage.dart';
 import 'package:foodhub/services/cloud/cloud_storage_constants.dart';
 import 'package:foodhub/services/cloud/cloud_storage_exception.dart';
 
-class FirebaseCloudStorage extends CloudStorage {
+class FirebaseCloudStorage implements CloudStorage {
   @override
-  Future<void> createNewProfile({
+  DocumentReference? profileRef;
+
+  @override
+  Future<void> createOrUpdateProfile({
     required String ownerUserId,
     required String name,
     required String email,
+    required String phone,
   }) async {
     final profile = initialize().collection('profile');
-    await profile.add({
+    final profileRef = await profile.add({
       ownerUserIdFieldName: ownerUserId,
       userNameFieldName: name,
       emailFieldName: email,
+      phoneFieldName: phone,
     });
+    this.profileRef = profileRef;
   }
 
   @override
@@ -44,15 +50,14 @@ class FirebaseCloudStorage extends CloudStorage {
         .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
         .get()
         .then((event) => event.docs);
-    final verificationDocs =
-        await _listenToDocumentStream(verificationDocsList);
+    final verificationDocs = await _listenToDocument(verificationDocsList);
     final verificationCodeMap = verificationDocs[0];
     final verificationCode = verificationCodeMap['verification_code'];
     return verificationCode;
   }
 }
 
-Future<List<Map<String, dynamic>>> _listenToDocumentStream(
+Future<List<Map<String, dynamic>>> _listenToDocument(
     List<QueryDocumentSnapshot<Map<String, dynamic>>> snapshots) async {
   List<Map<String, dynamic>> verificationDocs = [];
 

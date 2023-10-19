@@ -1,10 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 abstract class CloudStorage {
-  Future<void> createNewProfile({
+  DocumentReference? profileRef;
+  Future<void> createOrUpdateProfile({
     required String ownerUserId,
     required String name,
     required String email,
+    required String phone,
   });
   FirebaseFirestore initialize();
   Future<void> storeVerificationCode({

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart' show immutable;
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 @immutable
 abstract class FoodHubEvent {
@@ -48,7 +49,7 @@ class AuthEventVerifyPhoneCode extends FoodHubEvent {
 }
 
 class AuthEventVerifyPhone extends FoodHubEvent {
-  final String phoneNumber;
+  final PhoneNumber phoneNumber;
 
   const AuthEventVerifyPhone({
     required this.phoneNumber,

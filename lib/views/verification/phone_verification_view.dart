@@ -184,8 +184,8 @@ class _PhoneVerificationViewState extends State<PhoneVerificationView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     return Container(
-      width: screenWidth * 0.08,
-      height: screenHeight * 0.04,
+      width: screenWidth * 0.09,
+      height: screenHeight * 0.05,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(10.0),
         border: Border.all(

@@ -17,6 +17,7 @@ class PhoneRegistrationView extends StatefulWidget {
 class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
   late final TextEditingController _phone;
   final FocusNode _focusNodePhoneNumber = FocusNode();
+  PhoneNumber _number = PhoneNumber(isoCode: 'NG');
 
   @override
   void initState() {
@@ -172,12 +173,14 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                           ),
                         ),
                         child: InternationalPhoneNumberInput(
-                          textFieldController: _phone,
+                          formatInput: true,
+                          ignoreBlank: false,
+                          autoValidateMode: AutovalidateMode.disabled,
                           focusNode: _focusNodePhoneNumber,
-                          initialValue: PhoneNumber(
-                            isoCode: 'NG',
-                          ),
-                          onInputChanged: (PhoneNumber number) {},
+                          initialValue: _number,
+                          onInputChanged: (PhoneNumber number) {
+                            _number = number;
+                          },
                           selectorConfig: const SelectorConfig(
                               selectorType: PhoneInputSelectorType.DROPDOWN,
                               trailingSpace: false,
@@ -203,7 +206,7 @@ class _PhoneRegistrationViewState extends State<PhoneRegistrationView> {
                         height: screenHeight * 0.08,
                         child: TextButton(
                           onPressed: () {
-                            final phoneNumber = _phone.text;
+                            final phoneNumber = _number;
                             context
                                 .read<FoodHubBloc>()
                                 .add(AuthEventVerifyPhone(

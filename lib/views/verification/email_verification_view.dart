@@ -5,6 +5,7 @@ import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/utilities/dialogs/error_dialog.dart';
+import 'package:foodhub/utilities/dialogs/success_dialog.dart';
 import 'package:foodhub/views/verification/verification_exception.dart';
 
 class EmailVerificationView extends StatefulWidget {
@@ -44,6 +45,9 @@ class _EmailVerificationViewState extends State<EmailVerificationView> {
     return BlocListener<FoodHubBloc, FoodHubState>(
       listener: (context, state) {
         if (state is AuthStateEmailNeedsVerification) {
+          if (state.isSuccessful == true) {
+            showSuccessDialog(context, 'Verification Successful');
+          }
           if (state.exception is InvalidVerifiationCodeException) {
             showErrorDialog(context, 'Invalid verification Code');
           } else if (state.exception is UpdateIsEmailVerifiedException) {

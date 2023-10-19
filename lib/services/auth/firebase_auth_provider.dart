@@ -6,9 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/firebase_options.dart';
 import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
-import 'package:foodhub/services/auth/auth_user.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
+import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
   @override
@@ -18,7 +18,7 @@ class FirebaseAuthProvider implements AuthProvider {
   String? verificationId;
 
   @override
-  Future<AuthUser> createUser({
+  Future<User> createUser({
     required String email,
     required String password,
   }) async {
@@ -49,17 +49,17 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  AuthUser? get currentUser {
+  User? get currentUser {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
-      return AuthUser.fromFirebase(user);
+      return user;
     } else {
       return null;
     }
   }
 
   @override
-  Future<AuthUser> logIn({
+  Future<User> logIn({
     required String email,
     required String password,
   }) async {
@@ -102,7 +102,7 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    FirebaseFunctions.instance.useFunctionsEmulator("localhost", 8329);
+    FirebaseFunctions.instance.useFunctionsEmulator("127.0.0.1", 5001);
   }
 
   @override
@@ -135,11 +135,11 @@ class FirebaseAuthProvider implements AuthProvider {
 
   @override
   Future<void> verifyPhoneNumber({
-    required phoneNumber,
+    required PhoneNumber phoneNumber,
     required BuildContext context,
   }) async {
     await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneNumber,
+      phoneNumber: phoneNumber.phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         try {
           await FirebaseAuth.instance.currentUser!

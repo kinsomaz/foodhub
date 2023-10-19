@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/services/auth/auth_user.dart';
 
 @immutable
 abstract class FoodHubState {
@@ -53,7 +53,7 @@ class AuthStateForgotPassword extends FoodHubState {
 }
 
 class AuthStateLoggedIn extends FoodHubState {
-  final AuthUser user;
+  final User user;
   const AuthStateLoggedIn({
     required this.user,
     required bool isLoading,
@@ -62,8 +62,11 @@ class AuthStateLoggedIn extends FoodHubState {
 
 class AuthStateEmailNeedsVerification extends FoodHubState {
   final Exception? exception;
+  final bool? isSuccessful;
   const AuthStateEmailNeedsVerification(
-      {required this.exception, required bool isLoading})
+      {required this.exception,
+      required bool isLoading,
+      required this.isSuccessful})
       : super(isLoading: isLoading);
 }
 
