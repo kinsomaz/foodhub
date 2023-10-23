@@ -13,14 +13,13 @@ abstract class FoodHubState {
 }
 
 class AuthStateUninitialized extends FoodHubState {
-  const AuthStateUninitialized({required bool isLoading})
-      : super(isLoading: isLoading);
+  const AuthStateUninitialized({required super.isLoading});
 }
 
 class AuthStateRegistering extends FoodHubState {
   final Exception? exception;
-  const AuthStateRegistering({required this.exception, required bool isLoading})
-      : super(isLoading: isLoading);
+  const AuthStateRegistering(
+      {required this.exception, required super.isLoading});
 }
 
 class AuthStateSigningIn extends FoodHubState {
@@ -28,17 +27,17 @@ class AuthStateSigningIn extends FoodHubState {
 
   const AuthStateSigningIn({
     required this.exception,
-    required bool isLoading,
-    String? loadingText,
-  }) : super(isLoading: isLoading, loadingText: loadingText);
+    required super.isLoading,
+    super.loadingText = null,
+  });
 }
 
 class AuthStatePhoneRegistration extends FoodHubState {
   final Exception? exception;
   const AuthStatePhoneRegistration({
     required this.exception,
-    required bool isLoading,
-  }) : super(isLoading: isLoading);
+    required super.isLoading,
+  });
 }
 
 class AuthStateForgotPassword extends FoodHubState {
@@ -48,16 +47,16 @@ class AuthStateForgotPassword extends FoodHubState {
   const AuthStateForgotPassword({
     required this.exception,
     required this.hasSentEmail,
-    required bool isLoading,
-  }) : super(isLoading: isLoading);
+    required super.isLoading,
+  });
 }
 
 class AuthStateLoggedIn extends FoodHubState {
   final User user;
   const AuthStateLoggedIn({
     required this.user,
-    required bool isLoading,
-  }) : super(isLoading: isLoading);
+    required super.isLoading,
+  });
 }
 
 class AuthStateEmailNeedsVerification extends FoodHubState {
@@ -65,28 +64,23 @@ class AuthStateEmailNeedsVerification extends FoodHubState {
   final bool? isSuccessful;
   const AuthStateEmailNeedsVerification(
       {required this.exception,
-      required bool isLoading,
-      required this.isSuccessful})
-      : super(isLoading: isLoading);
+      required super.isLoading,
+      required this.isSuccessful});
 }
 
 class AuthStatePhoneNeedsVerification extends FoodHubState {
   final Exception? exception;
   const AuthStatePhoneNeedsVerification(
-      {required this.exception, required bool isLoading})
-      : super(isLoading: isLoading);
+      {required this.exception, required super.isLoading});
 }
 
 class AuthStateLoggedOut extends FoodHubState with EquatableMixin {
   final Exception? exception;
   const AuthStateLoggedOut({
     required this.exception,
-    required bool isLoading,
-    String? loadingText,
-  }) : super(
-          isLoading: isLoading,
-          loadingText: loadingText,
-        );
+    required super.isLoading,
+    super.loadingText = null,
+  });
 
   @override
   List<Object?> get props => [exception, isLoading];

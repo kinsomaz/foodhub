@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/Google/google_sign_in_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
@@ -25,6 +26,8 @@ class WelcomeView extends StatelessWidget {
             await showErrorDialog(context, 'Authentication Failed');
           } else if (state.exception is GoogleErrorException) {
             await showErrorDialog(context, 'Try signing in again');
+          } else if (state.exception is SignInCancelledException) {
+            await showErrorDialog(context, 'Signing in Cancelled');
           }
         }
       },

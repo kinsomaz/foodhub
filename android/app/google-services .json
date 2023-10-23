@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "11291849538",
+    "project_id": "foodhub-363a9",
+    "storage_bucket": "foodhub-363a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:11291849538:android:244ffb4495b0b8974e0edb",
+        "android_client_info": {
+          "package_name": "com.samad.foodhub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "11291849538-rp57n1odjnv7qfaq431tc25tc8ltftcu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.samad.foodhub",
+            "certificate_hash": "2f639c0ad5932b65a27f83f51d1a0325a69c25a8"
+          }
+        },
+        {
+          "client_id": "11291849538-423mg6d86lm2r6jqpj7qogakpbufke5v.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAwuW3vLjneEgwGmFAXFoAyaJWHlbseFFY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "11291849538-423mg6d86lm2r6jqpj7qogakpbufke5v.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "11291849538-hjvm0ip230qn9udp7hbfo9cuobkvj0a7.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.samad.foodhub"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
+import 'package:foodhub/services/bloc/food_hub_state.dart';
+import 'package:foodhub/utilities/dialogs/error_dialog.dart';
+import 'package:foodhub/views/verification/verification_exception.dart';
 
 class PhoneVerificationView extends StatefulWidget {
   const PhoneVerificationView({super.key});
@@ -37,46 +41,69 @@ class _PhoneVerificationViewState extends State<PhoneVerificationView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              top: screenHeight * 0.06,
-              left: screenWidth * 0.05,
-            ),
-            child: Container(
-              height: screenHeight * 0.045,
-              width: screenWidth * 0.1,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5.0),
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 3,
-                      blurRadius: 7,
-                      offset: const Offset(0, 3),
-                    )
-                  ]),
-              child: IconButton(
-                onPressed: () {},
-                padding: EdgeInsets.only(
-                  left: screenWidth * 0.015,
-                ),
-                icon: Icon(
-                  Icons.arrow_back_ios,
-                  size: screenWidth * 0.05,
-                ),
-              ),
-            ),
-          ),
-          SingleChildScrollView(
+    return WillPopScope(
+      onWillPop: () async {
+        context
+            .read<FoodHubBloc>()
+            .add(const AuthEventVerifyPhone(phoneNumber: null));
+        return false;
+      },
+      child: BlocListener<FoodHubBloc, FoodHubState>(
+        listener: (context, state) {
+          if (state is AuthStatePhoneNeedsVerification) {
+            if (state.exception is InvalidVerifiationCodeException) {
+              showErrorDialog(context, 'Invalid verification Code');
+            } else if (state.exception is InvalidVerificationIdException) {
+              showErrorDialog(context, 'Invalid verification Id');
+            } else if (state.exception is TooManyRequestException) {
+              showErrorDialog(context, 'Too many attempt');
+            } else if (state.exception is GenericAuthException) {
+              showErrorDialog(context, 'Check your internet connection');
+            }
+          }
+        },
+        child: Scaffold(
+          body: SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                SizedBox(height: screenHeight * 0.19),
+                Padding(
+                  padding: EdgeInsets.only(
+                    top: screenHeight * 0.06,
+                    left: screenWidth * 0.05,
+                  ),
+                  child: Container(
+                    height: screenHeight * 0.045,
+                    width: screenWidth * 0.1,
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(5.0),
+                        color: Colors.white,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.5),
+                            spreadRadius: 3,
+                            blurRadius: 7,
+                            offset: const Offset(0, 3),
+                          )
+                        ]),
+                    child: IconButton(
+                      onPressed: () {
+                        context
+                            .read<FoodHubBloc>()
+                            .add(const AuthEventVerifyPhone(phoneNumber: null));
+                      },
+                      padding: EdgeInsets.only(
+                        left: screenWidth * 0.015,
+                      ),
+                      icon: Icon(
+                        Icons.arrow_back_ios,
+                        size: screenWidth * 0.05,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: screenHeight * 0.10),
                 Padding(
                   padding: EdgeInsets.only(
                     left: screenWidth * 0.05,
@@ -174,8 +201,8 @@ class _PhoneVerificationViewState extends State<PhoneVerificationView> {
                 ),
               ],
             ),
-          )
-        ],
+          ),
+        ),
       ),
     );
   }

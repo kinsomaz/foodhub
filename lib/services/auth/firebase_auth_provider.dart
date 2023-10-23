@@ -1,4 +1,3 @@
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/widgets.dart';
@@ -8,9 +7,15 @@ import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
+import 'package:foodhub/views/verification/verification_exception.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
 class FirebaseAuthProvider implements AuthProvider {
+  static final FirebaseAuthProvider _shared =
+      FirebaseAuthProvider._sharedInstance();
+  FirebaseAuthProvider._sharedInstance();
+  factory FirebaseAuthProvider() => _shared;
+
   @override
   int? resendToken;
 
@@ -92,8 +97,6 @@ class FirebaseAuthProvider implements AuthProvider {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
       await FirebaseAuth.instance.signOut();
-    } else {
-      throw UserNotLoggedInAuthException();
     }
   }
 
@@ -102,7 +105,6 @@ class FirebaseAuthProvider implements AuthProvider {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    FirebaseFunctions.instance.useFunctionsEmulator("127.0.0.1", 5001);
   }
 
   @override
@@ -184,5 +186,29 @@ class FirebaseAuthProvider implements AuthProvider {
         this.verificationId = verificationId;
       },
     );
+  }
+
+  @override
+  Future<void> verifyPhoneCode({
+    required String verificationId,
+    required String verificationCode,
+  }) async {
+    try {
+      PhoneAuthCredential credential = PhoneAuthProvider.credential(
+        verificationId: verificationId,
+        smsCode: verificationCode,
+      );
+      await FirebaseAuth.instance.currentUser!.linkWithCredential(credential);
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'invalid-verification-code') {
+        throw InvalidVerifiationCodeException();
+      } else if (e.code == 'invalid-verification-id') {
+        throw InvalidVerificationIdException();
+      } else if (e.code == 'too-many-requests') {
+        throw TooManyRequestException();
+      } else {
+        throw GenericAuthException();
+      }
+    }
   }
 }

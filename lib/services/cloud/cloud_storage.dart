@@ -1,8 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodhub/services/cloud/cloud_profile.dart';
 
 abstract class CloudStorage {
-  DocumentReference? profileRef;
-  Future<void> createOrUpdateProfile({
+  Future<void> createNewProfile({
     required String ownerUserId,
     required String name,
     required String email,
@@ -14,6 +14,12 @@ abstract class CloudStorage {
     required String verificationCode,
   });
   Future<String> readVerificationCode({
+    required String ownerUserId,
+  });
+  Future<DocumentReference<Object?>?> getProfileRef({
+    required String uid,
+  });
+  Stream<Iterable<CloudProfile>> userProfile({
     required String ownerUserId,
   });
 }

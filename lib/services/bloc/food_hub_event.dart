@@ -49,7 +49,7 @@ class AuthEventVerifyPhoneCode extends FoodHubEvent {
 }
 
 class AuthEventVerifyPhone extends FoodHubEvent {
-  final PhoneNumber phoneNumber;
+  final PhoneNumber? phoneNumber;
 
   const AuthEventVerifyPhone({
     required this.phoneNumber,

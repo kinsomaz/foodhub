@@ -1,29 +1,31 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:foodhub/services/cloud/cloud_profile.dart';
 import 'package:foodhub/services/cloud/cloud_storage.dart';
 import 'package:foodhub/services/cloud/cloud_storage_constants.dart';
 import 'package:foodhub/services/cloud/cloud_storage_exception.dart';
 
 class FirebaseCloudStorage implements CloudStorage {
-  @override
-  DocumentReference? profileRef;
+  static final FirebaseCloudStorage _shared =
+      FirebaseCloudStorage._sharedInstances();
+  FirebaseCloudStorage._sharedInstances();
+  factory FirebaseCloudStorage() => _shared;
 
   @override
-  Future<void> createOrUpdateProfile({
+  Future<void> createNewProfile({
     required String ownerUserId,
     required String name,
     required String email,
     required String phone,
   }) async {
     final profile = initialize().collection('profile');
-    final profileRef = await profile.add({
+    await profile.add({
       ownerUserIdFieldName: ownerUserId,
       userNameFieldName: name,
       emailFieldName: email,
       phoneFieldName: phone,
     });
-    this.profileRef = profileRef;
   }
 
   @override
@@ -50,14 +52,41 @@ class FirebaseCloudStorage implements CloudStorage {
         .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
         .get()
         .then((event) => event.docs);
-    final verificationDocs = await _listenToDocument(verificationDocsList);
+    final verificationDocs = await _getDocument(verificationDocsList);
     final verificationCodeMap = verificationDocs[0];
     final verificationCode = verificationCodeMap['verification_code'];
     return verificationCode;
   }
+
+  @override
+  Future<DocumentReference<Object?>?> getProfileRef({
+    required String uid,
+  }) async {
+    final profile = initialize().collection('profile');
+    QuerySnapshot querySnapshot =
+        await profile.where(ownerUserIdFieldName, isEqualTo: uid).get();
+    if (querySnapshot.docs.isNotEmpty) {
+      DocumentReference documentReference = querySnapshot.docs[0].reference;
+      return documentReference;
+    } else {
+      return null;
+    }
+  }
+
+  @override
+  Stream<List<CloudProfile>> userProfile({
+    required String ownerUserId,
+  }) {
+    final profile = initialize().collection('profile');
+    return profile
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .snapshots()
+        .map((event) =>
+            event.docs.map((doc) => CloudProfile.fromSnapshot(doc)).toList());
+  }
 }
 
-Future<List<Map<String, dynamic>>> _listenToDocument(
+Future<List<Map<String, dynamic>>> _getDocument(
     List<QueryDocumentSnapshot<Map<String, dynamic>>> snapshots) async {
   List<Map<String, dynamic>> verificationDocs = [];
 

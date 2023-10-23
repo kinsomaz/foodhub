@@ -22,4 +22,8 @@ abstract class AuthProvider {
     required PhoneNumber phoneNumber,
     required BuildContext context,
   });
+  Future<void> verifyPhoneCode({
+    required String verificationId,
+    required String verificationCode,
+  });
 }

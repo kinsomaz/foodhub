@@ -21,10 +21,10 @@ void main() {
     MaterialApp(
       title: 'Food Hub',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFE724C)),
-        useMaterial3: true,
-      ),
-      home: BlocProvider<FoodHubBloc>(
+          colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFFE724C)),
+          useMaterial3: true,
+          fontFamily: 'SofiaPro'),
+      home: BlocProvider(
         create: (context) => FoodHubBloc(
           FirebaseAuthProvider(),
           FirebaseCloudStorage(),
@@ -71,7 +71,9 @@ class HomePage extends StatelessWidget {
         } else if (state is AuthStateSigningIn) {
           return const LoginView();
         } else {
-          return const Scaffold();
+          return const Scaffold(
+            body: CircularProgressIndicator(),
+          );
         }
       },
     );

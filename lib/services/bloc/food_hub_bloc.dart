@@ -1,6 +1,4 @@
 import 'package:bloc/bloc.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodhub/Google/google_sign_in.dart';
@@ -92,35 +90,11 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           final originalVerificationCode =
               await storage.readVerificationCode(ownerUserId: user!.uid);
           if (verificationCode == originalVerificationCode) {
-            final HttpsCallable setVerifiedEmail =
-                FirebaseFunctions.instance.httpsCallable('setVerifiedEmail');
-            try {
-              final result = await setVerifiedEmail();
-              final Map<String, dynamic> data =
-                  Map<String, dynamic>.from(result.data);
-              if (data.containsKey('success') && data['success'] == true) {
-                emit(
-                  const AuthStateEmailNeedsVerification(
-                    isLoading: false,
-                    exception: null,
-                    isSuccessful: true,
-                  ),
-                );
-              }
-            } on FirebaseException catch (e) {
-              emit(
-                AuthStateEmailNeedsVerification(
-                  isLoading: false,
-                  exception: e,
-                  isSuccessful: null,
-                ),
-              );
-            }
             emit(
               const AuthStateEmailNeedsVerification(
                 isLoading: false,
                 exception: null,
-                isSuccessful: null,
+                isSuccessful: true,
               ),
             );
             emit(
@@ -155,11 +129,19 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
       (event, emit) async {
         final phoneNumber = event.phoneNumber;
         final user = provider.currentUser;
-        emit(const AuthStatePhoneRegistration(
-          exception: null,
-          isLoading: true,
-        ));
-        if (user != null) {
+        if (phoneNumber == null) {
+          emit(const AuthStatePhoneRegistration(
+            exception: null,
+            isLoading: false,
+          ));
+        } else {
+          emit(const AuthStatePhoneRegistration(
+            exception: null,
+            isLoading: true,
+          ));
+        }
+
+        if (user != null && phoneNumber != null) {
           try {
             await provider.verifyPhoneNumber(
                 phoneNumber: phoneNumber, context: context);
@@ -205,23 +187,31 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             );
             final verificationId = provider.verificationId;
             if (verificationId != null) {
-              PhoneAuthCredential credential = PhoneAuthProvider.credential(
-                  verificationId: verificationId, smsCode: verificationCode);
-              await FirebaseAuth.instance.currentUser!
-                  .linkWithCredential(credential);
-              final user = provider.currentUser;
-              final profileRef = storage.profileRef;
-              if (profileRef != null) {
-                profileRef.update({
-                  phoneFieldName: user!.phoneNumber,
-                });
+              try {
+                await provider.verifyPhoneCode(
+                    verificationId: verificationId,
+                    verificationCode: verificationCode);
+                final user = provider.currentUser;
+                final profileRef = await storage.getProfileRef(uid: user!.uid);
+                if (profileRef != null) {
+                  profileRef.update({
+                    phoneFieldName: user.phoneNumber,
+                  });
+                }
+                emit(
+                  AuthStateLoggedIn(
+                    user: user,
+                    isLoading: false,
+                  ),
+                );
+              } on FirebaseAuthException catch (e) {
+                emit(
+                  AuthStatePhoneNeedsVerification(
+                    exception: e,
+                    isLoading: false,
+                  ),
+                );
               }
-              emit(
-                AuthStateLoggedIn(
-                  user: user!,
-                  isLoading: false,
-                ),
-              );
             }
           }
         }
@@ -246,7 +236,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           );
 
           //store users profile in cloud
-          await storage.createOrUpdateProfile(
+          await storage.createNewProfile(
             ownerUserId: user.uid,
             name: name,
             email: email,
@@ -295,28 +285,41 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
         );
         try {
           User? user = await googleSignIn();
+          final name = user!.displayName;
+          final email = user.email;
+          final uid = user.uid;
+
+          final profileRef = await storage.getProfileRef(uid: user.uid);
+          if (profileRef == null) {
+            await storage.createNewProfile(
+              ownerUserId: uid,
+              name: name ?? '',
+              email: email ?? '',
+              phone: '',
+            );
+          }
+
           emit(
             const AuthStateLoggedOut(
               exception: null,
               isLoading: false,
             ),
           );
-          final name = user!.displayName;
-          final email = user.email;
-          final uid = user.uid;
-
-          await storage.createOrUpdateProfile(
-            ownerUserId: uid,
-            name: name ?? '',
-            email: email ?? '',
-            phone: '',
-          );
-          emit(
-            const AuthStatePhoneRegistration(
-              exception: null,
-              isLoading: false,
-            ),
-          );
+          if (user.phoneNumber == null || user.phoneNumber == '') {
+            emit(
+              const AuthStatePhoneRegistration(
+                exception: null,
+                isLoading: false,
+              ),
+            );
+          } else {
+            emit(
+              AuthStateLoggedIn(
+                user: user,
+                isLoading: false,
+              ),
+            );
+          }
         } on Exception catch (e) {
           emit(
             AuthStateLoggedOut(
@@ -347,7 +350,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               isSuccessful: null,
             ),
           );
-        } else if (user.phoneNumber == null) {
+        } else if (user.phoneNumber == null || user.phoneNumber == "") {
           emit(
             const AuthStatePhoneRegistration(
               exception: null,
@@ -393,6 +396,19 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
                 isLoading: false,
                 exception: null,
                 isSuccessful: null,
+              ),
+            );
+          } else if (user.phoneNumber == null || user.phoneNumber == "") {
+            emit(
+              const AuthStateSigningIn(
+                exception: null,
+                isLoading: false,
+              ),
+            );
+            emit(
+              const AuthStatePhoneRegistration(
+                exception: null,
+                isLoading: false,
               ),
             );
           } else {

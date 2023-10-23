@@ -4,9 +4,9 @@ import 'package:foodhub/Google/google_sign_in_exception.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 Future<User?> googleSignIn() async {
-  final FirebaseAuth auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
   try {
+    final FirebaseAuth auth = FirebaseAuth.instance;
+    final GoogleSignIn googleSignIn = GoogleSignIn();
     final GoogleSignInAccount? googleSignInAccount =
         await googleSignIn.signIn();
     final GoogleSignInAuthentication googleSignInAuthentication =
@@ -24,12 +24,12 @@ Future<User?> googleSignIn() async {
   } on PlatformException catch (e) {
     if (e.code == 'appleSignInNotSupported') {
       throw SignInWithAppleNotSupportedException();
-    }
-    if (e.code == 'accountNotFound') {
+    } else if (e.code == 'accountNotFound') {
       throw GoogleSignInAccountNotFoundException();
-    }
-    if (e.code == 'authenticationFailed') {
+    } else if (e.code == 'authenticationFailed') {
       throw GoogleSignInAuthenticationException();
+    } else if (e.code == 'sign_in_canceled') {
+      throw SignInCancelledException();
     } else {
       throw GoogleErrorException();
     }
