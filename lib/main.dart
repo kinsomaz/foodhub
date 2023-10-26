@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/constants/routes.dart';
 import 'package:foodhub/helpers/loading/loading_screen.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
-import 'package:foodhub/services/cloud/firebase_cloud_storage.dart';
+import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/home_screen_view.dart';
+import 'package:foodhub/views/foodhub/profile_view.dart';
 import 'package:foodhub/views/login_view.dart';
 import 'package:foodhub/views/phone_registration_view.dart';
 import 'package:foodhub/views/reset_password_view.dart';
@@ -27,11 +29,12 @@ void main() {
       home: BlocProvider(
         create: (context) => FoodHubBloc(
           FirebaseAuthProvider(),
-          FirebaseCloudStorage(),
+          FirebaseCloudDatabase(),
           context,
         ),
         child: const HomePage(),
       ),
+      routes: {profileRoute: (context) => const ProfileView()},
     ),
   );
 }

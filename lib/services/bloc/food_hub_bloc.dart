@@ -5,18 +5,19 @@ import 'package:foodhub/Google/google_sign_in.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
-import 'package:foodhub/services/cloud/cloud_storage.dart';
-import 'package:foodhub/services/cloud/cloud_storage_constants.dart';
+import 'package:foodhub/services/cloud/database/cloud_database.dart';
+import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/views/verification/send_verification_email_code.dart';
 import 'package:foodhub/views/verification/email_verification_code_generator.dart';
 import 'package:foodhub/views/verification/verification_exception.dart';
 
 class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
   final AuthProvider provider;
-  final CloudStorage storage;
+  final CloudDatabase database;
   final BuildContext context;
-  FoodHubBloc(this.provider, this.storage, this.context)
+  FoodHubBloc(this.provider, this.database, this.context)
       : super(const AuthStateUninitialized(isLoading: true)) {
+    // go to the register screen
     on<AuthEventShouldRegister>(
       (event, emit) {
         emit(const AuthStateRegistering(
@@ -25,6 +26,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
         ));
       },
     );
+    // go to the sign in screen
     on<AuthEventShouldSignIn>(
       (event, emit) {
         emit(
@@ -88,7 +90,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
         try {
           final user = provider.currentUser;
           final originalVerificationCode =
-              await storage.readVerificationCode(ownerUserId: user!.uid);
+              await database.readVerificationCode(ownerUserId: user!.uid);
           if (verificationCode == originalVerificationCode) {
             emit(
               const AuthStateEmailNeedsVerification(
@@ -192,9 +194,9 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
                     verificationId: verificationId,
                     verificationCode: verificationCode);
                 final user = provider.currentUser;
-                final profileRef = await storage.getProfileRef(uid: user!.uid);
+                final profileRef = await database.getProfileRef(uid: user!.uid);
                 if (profileRef != null) {
-                  profileRef.update({
+                  await profileRef.update({
                     phoneFieldName: user.phoneNumber,
                   });
                 }
@@ -236,7 +238,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           );
 
           //store users profile in cloud
-          await storage.createNewProfile(
+          await database.createNewProfile(
             ownerUserId: user.uid,
             name: name,
             email: email,
@@ -247,7 +249,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           final verificationCode = generateRandomCode();
           await sendVerificationEmailCode(
               email: email, verificationCode: verificationCode);
-          await storage.storeVerificationCode(
+          await database.storeVerificationCode(
             ownerUserId: user.uid,
             verificationCode: verificationCode,
           );
@@ -289,9 +291,9 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           final email = user.email;
           final uid = user.uid;
 
-          final profileRef = await storage.getProfileRef(uid: user.uid);
+          final profileRef = await database.getProfileRef(uid: user.uid);
           if (profileRef == null) {
-            await storage.createNewProfile(
+            await database.createNewProfile(
               ownerUserId: uid,
               name: name ?? '',
               email: email ?? '',

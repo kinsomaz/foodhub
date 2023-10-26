@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodhub/services/cloud/cloud_profile.dart';
+import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 
-abstract class CloudStorage {
+abstract class CloudDatabase {
   Future<void> createNewProfile({
     required String ownerUserId,
     required String name,

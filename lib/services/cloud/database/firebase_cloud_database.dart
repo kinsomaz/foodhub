@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:foodhub/services/cloud/cloud_profile.dart';
-import 'package:foodhub/services/cloud/cloud_storage.dart';
-import 'package:foodhub/services/cloud/cloud_storage_constants.dart';
-import 'package:foodhub/services/cloud/cloud_storage_exception.dart';
+import 'package:foodhub/services/cloud/database/cloud_profile.dart';
+import 'package:foodhub/services/cloud/database/cloud_database.dart';
+import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
+import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
 
-class FirebaseCloudStorage implements CloudStorage {
-  static final FirebaseCloudStorage _shared =
-      FirebaseCloudStorage._sharedInstances();
-  FirebaseCloudStorage._sharedInstances();
-  factory FirebaseCloudStorage() => _shared;
+class FirebaseCloudDatabase implements CloudDatabase {
+  static final FirebaseCloudDatabase _shared =
+      FirebaseCloudDatabase._sharedInstances();
+  FirebaseCloudDatabase._sharedInstances();
+  factory FirebaseCloudDatabase() => _shared;
 
   @override
   Future<void> createNewProfile({

@@ -173,7 +173,7 @@ class _LoginViewState extends State<LoginView> {
                         color: const Color(0xFFC4C4C4),
                       ),
                       border: InputBorder.none,
-                      contentPadding: EdgeInsets.all(10.0),
+                      contentPadding: const EdgeInsets.all(10.0),
                     ),
                     cursorColor: const Color(0xFFFE724C),
                   ),

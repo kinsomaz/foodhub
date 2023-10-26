@@ -1,12 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/constants/routes.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
-import 'package:foodhub/services/cloud/cloud_profile.dart';
-import 'package:foodhub/services/cloud/firebase_cloud_storage.dart';
+import 'package:foodhub/services/cloud/database/cloud_profile.dart';
+import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
+import 'package:foodhub/views/foodhub/conditional_network_image.dart';
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({super.key});
@@ -16,12 +18,12 @@ class HomeScreenView extends StatefulWidget {
 }
 
 class _HomeScreenViewState extends State<HomeScreenView> {
-  late final FirebaseCloudStorage _cloudServices;
+  late final FirebaseCloudDatabase _cloudServices;
   late final User? _user;
 
   @override
   void initState() {
-    _cloudServices = FirebaseCloudStorage();
+    _cloudServices = FirebaseCloudDatabase();
     _user = FirebaseAuthProvider().currentUser;
     super.initState();
   }
@@ -30,14 +32,16 @@ class _HomeScreenViewState extends State<HomeScreenView> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
+    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
+      key: scaffoldKey,
       appBar: AppBar(
         title: const Text('Food Hub'),
       ),
       drawer: StreamBuilder(
         stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
-        builder: (context, snapshot) {
+        builder: (drawerContext, snapshot) {
           switch (snapshot.connectionState) {
             case ConnectionState.waiting:
             case ConnectionState.active:
@@ -73,9 +77,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               color: const Color(0xFF9EA1B1),
                             ),
                           ),
-                          currentAccountPicture: const CircleAvatar(
-                            backgroundImage:
-                                AssetImage("assets/profile_avatar.jpg"),
+                          currentAccountPicture: ConditionalNetworkImage(
+                            imageUrl: userProfile.profileImageUrl,
+                            radius: screenWidth * 0.1,
                           ),
                         ),
                         ListTile(
@@ -106,7 +110,10 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            scaffoldKey.currentState!.closeDrawer();
+                            Navigator.of(context).pushNamed(profileRoute);
+                          },
                         ),
                         ListTile(
                           leading: Image.asset(
@@ -210,8 +217,9 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               ),
                             ),
                             onPressed: () async {
+                              scaffoldKey.currentState!.closeDrawer();
                               final shouldLogout =
-                                  await showLogOutDialog(context);
+                                  await showLogOutDialog(drawerContext);
                               if (shouldLogout) {
                                 // ignore: use_build_context_synchronously
                                 context.read<FoodHubBloc>().add(
