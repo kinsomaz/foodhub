@@ -1,11 +1,11 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class ConditionalNetworkImage extends StatelessWidget {
+class ProfileImage extends StatelessWidget {
   final String? imageUrl;
   final double radius;
 
-  const ConditionalNetworkImage({
+  const ProfileImage({
     super.key,
     required this.imageUrl,
     required this.radius,

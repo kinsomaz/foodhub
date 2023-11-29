@@ -7,6 +7,8 @@ import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
+import 'package:foodhub/views/foodhub/add_new_address_view.dart';
+import 'package:foodhub/views/foodhub/address_search_screen.dart';
 import 'package:foodhub/views/foodhub/home_screen_view.dart';
 import 'package:foodhub/views/foodhub/profile_view.dart';
 import 'package:foodhub/views/login_view.dart';
@@ -34,7 +36,11 @@ void main() {
         ),
         child: const HomePage(),
       ),
-      routes: {profileRoute: (context) => const ProfileView()},
+      routes: {
+        profileRoute: (context) => const ProfileView(),
+        deliveryAddressRoute: (context) => const AddressView(),
+        addressSearchRoute: (context) => const AddressSearchScreen(),
+      },
     ),
   );
 }

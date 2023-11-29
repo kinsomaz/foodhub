@@ -8,7 +8,7 @@ import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
-import 'package:foodhub/views/foodhub/conditional_network_image.dart';
+import 'package:foodhub/views/foodhub/profile_image.dart';
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({super.key});
@@ -38,6 +38,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
       key: scaffoldKey,
       appBar: AppBar(
         title: const Text('Food Hub'),
+        centerTitle: true,
       ),
       drawer: StreamBuilder(
         stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
@@ -77,7 +78,7 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               color: const Color(0xFF9EA1B1),
                             ),
                           ),
-                          currentAccountPicture: ConditionalNetworkImage(
+                          currentAccountPicture: ProfileImage(
                             imageUrl: userProfile.profileImageUrl,
                             radius: screenWidth * 0.1,
                           ),
@@ -128,7 +129,11 @@ class _HomeScreenViewState extends State<HomeScreenView> {
                               fontWeight: FontWeight.w400,
                             ),
                           ),
-                          onTap: () {},
+                          onTap: () {
+                            scaffoldKey.currentState!.closeDrawer();
+                            Navigator.of(context)
+                                .pushNamed(deliveryAddressRoute);
+                          },
                         ),
                         ListTile(
                           leading: Image.asset(
