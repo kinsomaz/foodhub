@@ -7,6 +7,9 @@ class CloudProfile {
   final String userEmail;
   final String phoneNumber;
   final String profileImageUrl;
+  final String state;
+  final String city;
+  final String street;
 
   CloudProfile({
     required this.userName,
@@ -14,6 +17,9 @@ class CloudProfile {
     required this.phoneNumber,
     required this.ownerUserId,
     required this.profileImageUrl,
+    required this.state,
+    required this.city,
+    required this.street,
   });
 
   CloudProfile.fromSnapshot(
@@ -22,5 +28,8 @@ class CloudProfile {
         userName = snapshot.data()[userNameFieldName],
         userEmail = snapshot.data()[emailFieldName],
         phoneNumber = snapshot.data()[phoneFieldName],
-        profileImageUrl = snapshot.data()[profileImageUrlFieldName];
+        profileImageUrl = snapshot.data()[profileImageUrlFieldName],
+        state = snapshot.data()[stateFieldName],
+        city = snapshot.data()[cityFieldName],
+        street = snapshot.data()[streetFieldName];
 }

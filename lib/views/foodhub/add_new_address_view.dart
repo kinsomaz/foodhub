@@ -6,7 +6,7 @@ import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/address/country.dart';
-import 'package:foodhub/views/foodhub/address_search_screen.dart';
+import 'package:foodhub/views/foodhub/address_search_body.dart';
 
 class AddressView extends StatefulWidget {
   const AddressView({super.key});
@@ -27,8 +27,9 @@ class _AddressViewState extends State<AddressView> {
   late final User? _user;
   String selectedCountryCode = '';
   List<csc.State>? countryState;
-  String selectedState = '';
-  List<csc.City> selectedCity = [];
+  String? selectedState;
+  List<csc.City> cities = [];
+  String? selectedCity;
 
   @override
   void initState() {
@@ -346,6 +347,7 @@ class _AddressViewState extends State<AddressView> {
                               color: const Color(0xFF111719),
                             ),
                           ),
+                          value: selectedState,
                           icon: Icon(
                             Icons.arrow_forward_ios,
                             size: screenWidth * 0.04,
@@ -364,9 +366,9 @@ class _AddressViewState extends State<AddressView> {
                             final country = await csc
                                 .getCountryFromCode(selectedCountryCode);
                             final selected = await csc.getStateCities(
-                                country!.isoCode, selectedState);
+                                country!.isoCode, selectedState!);
                             setState(() {
-                              selectedCity = selected;
+                              cities = selected;
                             });
                           },
                         ),
@@ -424,18 +426,21 @@ class _AddressViewState extends State<AddressView> {
                               color: const Color(0xFF111719),
                             ),
                           ),
+                          value: selectedCity,
                           icon: Icon(
                             Icons.arrow_forward_ios,
                             size: screenWidth * 0.04,
                           ),
-                          items: selectedCity.map((csc.City city) {
+                          items: cities.map((csc.City city) {
                             return DropdownMenuItem(
                               value: city.name,
                               alignment: Alignment.center,
                               child: Text(city.name),
                             );
                           }).toList(),
-                          onChanged: (String? value) {},
+                          onChanged: (String? value) {
+                            selectedCity = value;
+                          },
                         ),
                       ),
                     ),

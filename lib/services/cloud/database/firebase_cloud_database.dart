@@ -18,6 +18,9 @@ class FirebaseCloudDatabase implements CloudDatabase {
     required String name,
     required String email,
     required String phone,
+    required String state,
+    required String city,
+    required String street,
   }) async {
     final profile = initialize().collection('profile');
     await profile.add({

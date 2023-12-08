@@ -243,6 +243,9 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             name: name,
             email: email,
             phone: '',
+            state: '',
+            city: '',
+            street: '',
           );
 
           //send verificationCode to user email and store in cloud
@@ -298,6 +301,9 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               name: name ?? '',
               email: email ?? '',
               phone: '',
+              state: '',
+              city: '',
+              street: '',
             );
           }
 

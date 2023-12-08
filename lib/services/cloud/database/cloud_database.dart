@@ -7,6 +7,9 @@ abstract class CloudDatabase {
     required String name,
     required String email,
     required String phone,
+    required String state,
+    required String city,
+    required String street,
   });
   FirebaseFirestore initialize();
   Future<void> storeVerificationCode({

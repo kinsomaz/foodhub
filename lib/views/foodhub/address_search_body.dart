@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:foodhub/views/foodhub/address_suggestion.dart';
 
 class AddressSearchScreen extends StatefulWidget {
   const AddressSearchScreen({super.key});
@@ -10,6 +11,7 @@ class AddressSearchScreen extends StatefulWidget {
 class _AddressSearchScreenState extends State<AddressSearchScreen> {
   late final TextEditingController _street;
   final FocusNode _focusNodeStreet = FocusNode();
+  List addresses = [];
 
   @override
   void initState() {
@@ -124,6 +126,12 @@ class _AddressSearchScreenState extends State<AddressSearchScreen> {
             ],
           ),
         ),
+      ),
+      body: AddressSuggestion(
+        addresses: addresses,
+        onAddressSelected: (String address) {
+          Navigator.pop(context);
+        },
       ),
     );
   }
