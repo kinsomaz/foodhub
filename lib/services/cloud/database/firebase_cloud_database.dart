@@ -5,6 +5,7 @@ import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
+import 'package:foodhub/views/foodhub/food_caregory.dart';
 
 class FirebaseCloudDatabase implements CloudDatabase {
   static final FirebaseCloudDatabase _shared =
@@ -28,6 +29,9 @@ class FirebaseCloudDatabase implements CloudDatabase {
       userNameFieldName: name,
       emailFieldName: email,
       phoneFieldName: phone,
+      stateFieldName: state,
+      cityFieldName: city,
+      streetFieldName: street,
     });
   }
 
@@ -86,6 +90,14 @@ class FirebaseCloudDatabase implements CloudDatabase {
         .snapshots()
         .map((event) =>
             event.docs.map((doc) => CloudProfile.fromSnapshot(doc)).toList());
+  }
+
+  @override
+  Stream<List<FoodCategory>> foodCategory() {
+    final foodCategory = initialize().collection('foodCategory');
+    final snapshot = foodCategory.snapshots();
+    return snapshot.map((event) =>
+        event.docs.map((doc) => FoodCategory.fromSnapshot(doc)).toList());
   }
 }
 

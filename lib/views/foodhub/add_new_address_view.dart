@@ -25,10 +25,12 @@ class _AddressViewState extends State<AddressView> {
   final FocusNode _focusNodeCity = FocusNode();
   final FocusNode _focusNodeStreet = FocusNode();
   late final User? _user;
-  String selectedCountryCode = '';
+  String selectedCountryIsoCode = '';
+  String? _userState;
+  String? _userCity;
   List<csc.State>? countryState;
+  List<csc.City>? stateCities;
   String? selectedState;
-  List<csc.City> cities = [];
   String? selectedCity;
 
   @override
@@ -50,46 +52,19 @@ class _AddressViewState extends State<AddressView> {
         setState(() {});
       },
     );
-    _getStatesOfCountry().then((state) {
-      setState(() {
-        countryState = state;
-      });
-    });
     super.initState();
   }
 
-  void _getCountryCode({required String phoneNumber}) {
+  void _getCountryCode({required String phoneNumber}) async {
     Map<String, String> foundedCountry = {};
     for (var country in Countries.allCountries) {
       String dialCode = country["dial_code"].toString();
       if (phoneNumber.contains(dialCode)) {
         foundedCountry = country;
-        selectedCountryCode = foundedCountry['code']!;
+        selectedCountryIsoCode = foundedCountry['code']!;
       }
     }
-  }
-
-  void _nameTextControllerListener() async {
-    final name = _name.text;
-    final profileRef = await _cloudServices.getProfileRef(uid: _user!.uid);
-    if (profileRef != null) {
-      await profileRef.update({userNameFieldName: name});
-    }
-  }
-
-  void _phoneNumberTextControllerListener() async {
-    final phoneNumber = _phoneNumber.text;
-    final profileRef = await _cloudServices.getProfileRef(uid: _user!.uid);
-    if (profileRef != null) {
-      await profileRef.update({phoneFieldName: phoneNumber});
-    }
-  }
-
-  void _setUpTextControllerListener() {
-    _name.removeListener(_nameTextControllerListener);
-    _phoneNumber.removeListener(_phoneNumberTextControllerListener);
-    _name.addListener(_nameTextControllerListener);
-    _phoneNumber.addListener(_phoneNumberTextControllerListener);
+    return null;
   }
 
   void _defaultTextControllerValues({
@@ -100,6 +75,24 @@ class _AddressViewState extends State<AddressView> {
     _phoneNumber.text = phone;
   }
 
+  void _updateStateInDatabase({
+    required String state,
+  }) async {
+    final profileRef = await _cloudServices.getProfileRef(uid: _user!.uid);
+    if (profileRef != null) {
+      await profileRef.update({stateFieldName: state});
+    }
+  }
+
+  void _updateCityInDatabase({
+    required String city,
+  }) async {
+    final profileRef = await _cloudServices.getProfileRef(uid: _user!.uid);
+    if (profileRef != null) {
+      await profileRef.update({cityFieldName: city});
+    }
+  }
+
   void _onStreetFieldFocus() {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (context) => const AddressSearchScreen(),
@@ -107,7 +100,12 @@ class _AddressViewState extends State<AddressView> {
   }
 
   Future<List<csc.State>> _getStatesOfCountry() async {
-    return countryState = await csc.getStatesOfCountry(selectedCountryCode);
+    return countryState = await csc.getStatesOfCountry(selectedCountryIsoCode);
+  }
+
+  Future<List<csc.City>> _getCitiesOfState() async {
+    return stateCities =
+        await csc.getStateCities(selectedCountryIsoCode, _userState!);
   }
 
   @override
@@ -116,6 +114,7 @@ class _AddressViewState extends State<AddressView> {
     _phoneNumber.dispose();
     _street.dispose();
     _focusNodeState.dispose();
+    _focusNodeCity.dispose();
     _focusNodeStreet.dispose();
     super.dispose();
   }
@@ -125,24 +124,19 @@ class _AddressViewState extends State<AddressView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return FutureBuilder(
-      future: () async {
-        final userProfile =
-            await _cloudServices.userProfile(ownerUserId: _user!.uid).first;
-        final stateData = await _getStatesOfCountry();
-        return [userProfile, stateData];
-      }(),
+    return StreamBuilder(
+      stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
       builder: (context, snapshot) {
-        _setUpTextControllerListener();
         if (snapshot.hasData) {
-          final List data = snapshot.data as List;
-          final profiles = data[0] as List<CloudProfile>;
+          final profiles = snapshot.data as List<CloudProfile>;
           final userProfile = profiles[0];
           _getCountryCode(phoneNumber: userProfile.phoneNumber);
           _defaultTextControllerValues(
             name: userProfile.userName,
             phone: userProfile.phoneNumber,
           );
+          _userState = userProfile.state;
+          _userCity = userProfile.city;
           return Scaffold(
             appBar: AppBar(
               leading: Padding(
@@ -332,46 +326,64 @@ class _AddressViewState extends State<AddressView> {
                               : const Color(0xFFEEEEEE),
                         ),
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          padding: EdgeInsets.only(
-                            left: screenWidth * 0.03,
-                            right: screenWidth * 0.03,
-                          ),
-                          hint: Text(
-                            'Select State',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.043,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF111719),
-                            ),
-                          ),
-                          value: selectedState,
-                          icon: Icon(
-                            Icons.arrow_forward_ios,
-                            size: screenWidth * 0.04,
-                          ),
-                          items: countryState!.map((csc.State state) {
-                            return DropdownMenuItem(
-                              value: state.isoCode,
-                              alignment: Alignment.center,
-                              child: Text(state.name),
+                      child: FutureBuilder(
+                        future: _getStatesOfCountry(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                padding: EdgeInsets.only(
+                                  left: screenWidth * 0.03,
+                                  right: screenWidth * 0.03,
+                                ),
+                                hint: Text(
+                                  'Select State',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.043,
+                                    fontFamily: 'SofiaPro',
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFF111719),
+                                  ),
+                                ),
+                                value: _userState!.isEmpty
+                                    ? selectedState
+                                    : _userState,
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: screenWidth * 0.04,
+                                ),
+                                items: countryState!.map((csc.State state) {
+                                  return DropdownMenuItem(
+                                    value: state.isoCode,
+                                    alignment: Alignment.center,
+                                    child: Text(state.name),
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue) async {
+                                  if (newValue != null) {
+                                    _updateStateInDatabase(state: newValue);
+                                    _updateCityInDatabase(city: '');
+                                    setState(() {
+                                      stateCities = null;
+                                      selectedCity = null;
+                                      selectedState = newValue;
+                                    });
+                                  }
+                                  final selected = await csc.getStateCities(
+                                      selectedCountryIsoCode, selectedState!);
+                                  setState(() {
+                                    stateCities = selected;
+                                  });
+                                },
+                              ),
                             );
-                          }).toList(),
-                          onChanged: (String? newValue) async {
-                            if (newValue != null) {
-                              selectedState = newValue;
-                            }
-                            final country = await csc
-                                .getCountryFromCode(selectedCountryCode);
-                            final selected = await csc.getStateCities(
-                                country!.isoCode, selectedState!);
-                            setState(() {
-                              cities = selected;
-                            });
-                          },
-                        ),
+                          } else {
+                            return Container(
+                                alignment: Alignment.center,
+                                width: screenWidth * 0.07,
+                                child: const CircularProgressIndicator());
+                          }
+                        },
                       ),
                     ),
                   ),
@@ -411,37 +423,57 @@ class _AddressViewState extends State<AddressView> {
                               : const Color(0xFFEEEEEE),
                         ),
                       ),
-                      child: DropdownButtonHideUnderline(
-                        child: DropdownButton(
-                          padding: EdgeInsets.only(
-                            left: screenWidth * 0.03,
-                            right: screenWidth * 0.03,
-                          ),
-                          hint: Text(
-                            'Select City',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.043,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF111719),
-                            ),
-                          ),
-                          value: selectedCity,
-                          icon: Icon(
-                            Icons.arrow_forward_ios,
-                            size: screenWidth * 0.04,
-                          ),
-                          items: cities.map((csc.City city) {
-                            return DropdownMenuItem(
-                              value: city.name,
-                              alignment: Alignment.center,
-                              child: Text(city.name),
+                      child: FutureBuilder(
+                        future: _getCitiesOfState(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            return DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                padding: EdgeInsets.only(
+                                  left: screenWidth * 0.03,
+                                  right: screenWidth * 0.03,
+                                ),
+                                hint: Text(
+                                  'Select City',
+                                  style: TextStyle(
+                                    fontSize: screenWidth * 0.043,
+                                    fontFamily: 'SofiaPro',
+                                    fontWeight: FontWeight.w400,
+                                    color: const Color(0xFF111719),
+                                  ),
+                                ),
+                                value: _userCity!.isEmpty
+                                    ? selectedCity
+                                    : _userCity,
+                                icon: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: screenWidth * 0.04,
+                                ),
+                                items: stateCities!.map((csc.City city) {
+                                  return DropdownMenuItem(
+                                    value: city.name,
+                                    alignment: Alignment.center,
+                                    child: Text(city.name),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  if (value != null) {
+                                    setState(() {
+                                      selectedCity = null;
+                                      selectedCity = value;
+                                    });
+                                    _updateCityInDatabase(city: value);
+                                  }
+                                },
+                              ),
                             );
-                          }).toList(),
-                          onChanged: (String? value) {
-                            selectedCity = value;
-                          },
-                        ),
+                          } else {
+                            return Container(
+                                alignment: Alignment.center,
+                                width: screenWidth * 0.07,
+                                child: const CircularProgressIndicator());
+                          }
+                        },
                       ),
                     ),
                   ),

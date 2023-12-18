@@ -2,12 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/constants/routes.dart';
+import 'package:foodhub/icons/custom_icon.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
+import 'package:foodhub/utilities/animations/water_flow_animation.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
+import 'package:foodhub/views/foodhub/food_caregory.dart';
+import 'package:foodhub/views/foodhub/food_category_list_view.dart';
 import 'package:foodhub/views/foodhub/profile_image.dart';
 
 class HomeScreenView extends StatefulWidget {
@@ -17,22 +21,43 @@ class HomeScreenView extends StatefulWidget {
   State<HomeScreenView> createState() => _HomeScreenViewState();
 }
 
-class _HomeScreenViewState extends State<HomeScreenView> {
+class _HomeScreenViewState extends State<HomeScreenView>
+    with SingleTickerProviderStateMixin {
+  late final TextEditingController _searchController;
   late final FirebaseCloudDatabase _cloudServices;
   late final User? _user;
+  late AnimationController _waterFlowController;
+  final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
+  final FocusNode _focusNodeSearch = FocusNode();
 
   @override
   void initState() {
+    _searchController = TextEditingController();
     _cloudServices = FirebaseCloudDatabase();
     _user = FirebaseAuthProvider().currentUser;
+    _focusNodeSearch.addListener(() {
+      setState(() {});
+    });
+    _waterFlowController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 2),
+    )..repeat(reverse: true);
+
     super.initState();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _focusNodeSearch.dispose();
+    _waterFlowController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
     return Scaffold(
       key: scaffoldKey,
@@ -247,6 +272,137 @@ class _HomeScreenViewState extends State<HomeScreenView> {
               );
           }
         },
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: screenHeight * 0.015,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.05,
+              ),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: SizedBox(
+                  width: screenWidth * 0.8,
+                  child: Text(
+                    'What would you like to order',
+                    style: TextStyle(
+                      fontSize: screenWidth * 0.08,
+                      fontWeight: FontWeight.w700,
+                      fontFamily: 'SofiaPro',
+                      color: const Color(0xFF111719),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: screenHeight * 0.01,
+            ),
+            Padding(
+              padding: EdgeInsets.only(
+                left: screenWidth * 0.05,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    height: screenHeight * 0.055,
+                    width: screenWidth * 0.7,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      border: Border.all(
+                        color: _focusNodeSearch.hasFocus
+                            ? const Color(0xFFFE724C)
+                            : const Color(0xFFEEEEEE),
+                      ),
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      focusNode: _focusNodeSearch,
+                      keyboardType: TextInputType.text,
+                      enableSuggestions: false,
+                      autocorrect: false,
+                      decoration: InputDecoration(
+                        hintText: 'Find for food or restaurant',
+                        hintStyle: TextStyle(
+                          fontSize: screenWidth * 0.039,
+                          fontWeight: FontWeight.w400,
+                          color: const Color(0xFF9AA0B4),
+                        ),
+                        prefixIcon: const Icon(Icons.search),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.all(1.0),
+                      ),
+                      cursorColor: const Color(0xFFFE724C),
+                    ),
+                  ),
+                  SizedBox(
+                    width: screenWidth * 0.04,
+                  ),
+                  Container(
+                    width: screenWidth * 0.1,
+                    height: screenHeight * 0.05,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(7.0),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          spreadRadius: 1,
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: CustomIcon(),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SizedBox(
+              height: screenHeight * 0.03,
+            ),
+            StreamBuilder(
+              stream: _cloudServices.foodCategory(),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    if (snapshot.hasData) {
+                      final foodCategories =
+                          snapshot.data as List<FoodCategory>;
+                      return SizedBox(
+                        height: 98,
+                        child: FoodCategoryListView(
+                          foodCategories: foodCategories,
+                          onTap: (catogoryName) {},
+                        ),
+                      );
+                    } else {
+                      return Row(
+                        children: List.generate(5, (index) {
+                          return WaterFlowAnimation(
+                            controller: _waterFlowController,
+                          );
+                        }),
+                      );
+                    }
+                  default:
+                    return const CircularProgressIndicator();
+                }
+              },
+            )
+          ],
+        ),
       ),
     );
   }
