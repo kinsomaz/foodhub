@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class CustomIcon extends StatelessWidget {
-  const CustomIcon({super.key});
+class CustomSearchSwitchIcon extends StatelessWidget {
+  const CustomSearchSwitchIcon({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -36,7 +36,7 @@ class MyPainter extends CustomPainter {
     // Draw the first filled circle
     paint.color = const Color(0xFFFE724C);
     paint.strokeWidth = 1.5;
-    canvas.drawCircle(const Offset(9.2061, 16), 3, paint);
+    canvas.drawCircle(const Offset(7.7061, 16), 3, paint);
 
     // Draw the third stroke line
     paint.color = const Color(0xFFFE724C);
@@ -52,7 +52,7 @@ class MyPainter extends CustomPainter {
     // Draw the second filled circle with offset
     paint.color = const Color(0xFFFE724C);
     paint.strokeWidth = 1.5;
-    canvas.drawCircle(const Offset(14.093, 4), 3, paint);
+    canvas.drawCircle(const Offset(14.593, 4), 3, paint);
   }
 
   @override

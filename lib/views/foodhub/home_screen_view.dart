@@ -1,18 +1,23 @@
+import 'dart:async';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/constants/routes.dart';
-import 'package:foodhub/icons/custom_icon.dart';
+import 'package:foodhub/helpers/loading/loadind_screen_for_food_category.dart';
+import 'package:foodhub/helpers/loading/loading_screen_for_restaurant.dart';
+import 'package:foodhub/icons/custom_search_switch_icon.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
-import 'package:foodhub/utilities/animations/water_flow_animation.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
-import 'package:foodhub/views/foodhub/food_caregory.dart';
+import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/food_category_list_view.dart';
 import 'package:foodhub/views/foodhub/profile_image.dart';
+import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/foodhub/restaurant_list_view.dart';
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({super.key});
@@ -27,6 +32,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final FirebaseCloudDatabase _cloudServices;
   late final User? _user;
   late AnimationController _waterFlowController;
+  late final StreamController<String?> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
 
@@ -35,6 +41,12 @@ class _HomeScreenViewState extends State<HomeScreenView>
     _searchController = TextEditingController();
     _cloudServices = FirebaseCloudDatabase();
     _user = FirebaseAuthProvider().currentUser;
+    _foodCategoryNameController = StreamController<String?>.broadcast(
+      onListen: () {
+        _foodCategoryNameController.sink.add('all');
+      },
+    );
+    super.initState();
     _focusNodeSearch.addListener(() {
       setState(() {});
     });
@@ -49,6 +61,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
   @override
   void dispose() {
     _searchController.dispose();
+    _foodCategoryNameController.close();
     _focusNodeSearch.dispose();
     _waterFlowController.dispose();
     super.dispose();
@@ -279,7 +292,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(
-              height: screenHeight * 0.015,
+              height: screenHeight * 0.01,
             ),
             Padding(
               padding: EdgeInsets.only(
@@ -317,10 +330,11 @@ class _HomeScreenViewState extends State<HomeScreenView>
                     width: screenWidth * 0.7,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10.0),
+                      color: const Color(0xFFFCFCFD),
                       border: Border.all(
                         color: _focusNodeSearch.hasFocus
                             ? const Color(0xFFFE724C)
-                            : const Color(0xFFEEEEEE),
+                            : const Color(0xFFEFEFEF),
                       ),
                     ),
                     child: TextField(
@@ -362,45 +376,134 @@ class _HomeScreenViewState extends State<HomeScreenView>
                       ],
                     ),
                     child: const Center(
-                      child: CustomIcon(),
+                      child: CustomSearchSwitchIcon(),
                     ),
                   ),
                 ],
               ),
             ),
             SizedBox(
-              height: screenHeight * 0.03,
+              height: screenHeight * 0.018,
             ),
             StreamBuilder(
               stream: _cloudServices.foodCategory(),
               builder: (context, snapshot) {
                 switch (snapshot.connectionState) {
                   case ConnectionState.waiting:
+                    return buildFoodCategoryLoadingState(
+                        screenWidth, _waterFlowController);
                   case ConnectionState.active:
                     if (snapshot.hasData) {
                       final foodCategories =
                           snapshot.data as List<FoodCategory>;
-                      return SizedBox(
-                        height: 98,
+                      return Container(
+                        height: 100,
+                        margin: EdgeInsets.only(
+                          left: screenWidth * 0.025,
+                          right: screenWidth * 0.025,
+                        ),
                         child: FoodCategoryListView(
                           foodCategories: foodCategories,
-                          onTap: (catogoryName) {},
+                          onTap: (foodCategory) {
+                            _foodCategoryNameController.add(foodCategory.name);
+                          },
                         ),
                       );
                     } else {
-                      return Row(
-                        children: List.generate(5, (index) {
-                          return WaterFlowAnimation(
-                            controller: _waterFlowController,
-                          );
-                        }),
-                      );
+                      return buildFoodCategoryLoadingState(
+                          screenWidth, _waterFlowController);
                     }
                   default:
-                    return const CircularProgressIndicator();
+                    return buildFoodCategoryLoadingState(
+                        screenWidth, _waterFlowController);
                 }
               },
-            )
+            ),
+            SizedBox(
+              height: screenHeight * 0.018,
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: screenWidth * 0.05,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: screenWidth * 0.67,
+                      child: Text(
+                        'Featured Restaurants',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.047,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'SofiaPro',
+                          color: const Color(0xFF323643),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: screenWidth * 0.04,
+                    top: screenHeight * 0.005,
+                  ),
+                  child: Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'View All',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.038,
+                        fontWeight: FontWeight.w400,
+                        fontFamily: 'SofiaPro',
+                        color: const Color(0xFFF56844),
+                      ),
+                    ),
+                  ),
+                ),
+                Icon(
+                  Icons.arrow_forward_ios,
+                  color: const Color(0xFFFE724C),
+                  size: screenWidth * 0.025,
+                )
+              ],
+            ),
+            SizedBox(
+              height: screenHeight * 0.005,
+            ),
+            StreamBuilder(
+              stream: _cloudServices.featuredRestaurantsStream(
+                  foodCategoryNameStream: _foodCategoryNameController.stream),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    if (snapshot.hasData) {
+                      final restaurants = snapshot.data as List<Restaurant>;
+                      return Container(
+                        height: screenHeight * 0.315,
+                        margin: EdgeInsets.only(
+                          left: screenWidth * 0.025,
+                          right: screenWidth * 0.025,
+                        ),
+                        child: RestaurantListView(
+                          restaurants: restaurants,
+                          onTap: (restaurant) {},
+                        ),
+                      );
+                    } else {
+                      return buildRestaurantLoadingState(
+                          screenHeight, screenWidth);
+                    }
+                  default:
+                    return buildRestaurantLoadingState(
+                        screenHeight, screenWidth);
+                }
+              },
+            ),
           ],
         ),
       ),

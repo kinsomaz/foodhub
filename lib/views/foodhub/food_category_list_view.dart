@@ -1,7 +1,8 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/food_caregory.dart';
+import 'package:foodhub/views/foodhub/food_category.dart';
 
-typedef FoodCategoryCallback = void Function(FoodCategory catogoryName);
+typedef FoodCategoryCallback = void Function(FoodCategory foodCategory);
 
 class FoodCategoryListView extends StatefulWidget {
   final Iterable<FoodCategory> foodCategories;
@@ -22,6 +23,8 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return ListView.builder(
       itemCount: widget.foodCategories.length,
       scrollDirection: Axis.horizontal,
@@ -34,26 +37,59 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
             });
             widget.onTap(foodCategory);
           },
-          child: Container(
-            width: 56,
-            height: 98,
-            margin: const EdgeInsets.only(right: 10.0),
-            decoration: BoxDecoration(
-              color: index == selectedIdx
-                  ? const Color(0xFFFE724C)
-                  : const Color(0xFFFFFFFF),
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                const CircleAvatar(
-                  backgroundColor: Colors.white,
-                  radius: 15,
-                  child: Placeholder(),
-                ),
-                Text(foodCategory.name),
-              ],
+          child: Padding(
+            padding: EdgeInsets.all(screenWidth * 0.025),
+            child: Container(
+              width: 54,
+              height: 100,
+              decoration: BoxDecoration(
+                color: index == selectedIdx
+                    ? const Color(0xFFFE724C)
+                    : const Color(0xFFFFFFFF),
+                borderRadius: BorderRadius.circular(25.0),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.1),
+                    spreadRadius: 1,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  CachedNetworkImage(
+                    imageUrl: foodCategory.imageUrl,
+                    imageBuilder: (context, imageProvider) => CircleAvatar(
+                      backgroundImage: imageProvider,
+                      backgroundColor: const Color(0xFFFFFFFF),
+                      radius: 23,
+                    ),
+                    placeholder: (context, url) => CircleAvatar(
+                      backgroundColor: Colors.black.withAlpha(10),
+                      radius: 23,
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 5,
+                  ),
+                  Text(
+                    foodCategory.name,
+                    style: TextStyle(
+                      color: index == selectedIdx
+                          ? const Color(0xFFFFFFFFF)
+                          : const Color(0xFF67666D),
+                      fontSize: 10,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         );

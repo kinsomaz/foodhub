@@ -26,6 +26,7 @@ dependencies:
   cached_network_image: ^3.3.0
   country_state_city: ^0.1.6
   async: ^2.11.0
+  flutter_svg: ^2.0.9
   
   
   
@@ -46,4 +47,7 @@ flutter:
     fonts:
       - asset: fonts/sofia-pro-cufonfonts/Sofia Pro Regular Az.otf
       - asset: fonts/sofia-pro-cufonfonts/Sofia Pro Bold Az.otf
-      
+  - family: HelveticaNeue
+    fonts:
+      - asset: fonts/HelveticaNeue/HelveticaNeue Light.ttf
+      - asset: fonts/HelveticaNeue/Helvetica Neu Bold.ttf   

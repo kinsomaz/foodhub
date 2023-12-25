@@ -5,7 +5,8 @@ import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
-import 'package:foodhub/views/foodhub/food_caregory.dart';
+import 'package:foodhub/views/foodhub/food_category.dart';
+import 'package:foodhub/views/foodhub/restaurant.dart';
 
 class FirebaseCloudDatabase implements CloudDatabase {
   static final FirebaseCloudDatabase _shared =
@@ -98,6 +99,39 @@ class FirebaseCloudDatabase implements CloudDatabase {
     final snapshot = foodCategory.snapshots();
     return snapshot.map((event) =>
         event.docs.map((doc) => FoodCategory.fromSnapshot(doc)).toList());
+  }
+
+  @override
+  Stream<List<Restaurant>?> featuredRestaurantsStream({
+    required Stream<String?> foodCategoryNameStream,
+  }) async* {
+    await for (var foodCategoryName in foodCategoryNameStream) {
+      try {
+        if (foodCategoryName == 'all') {
+          final restaurantCollection =
+              await initialize().collection('restaurant').get();
+          final restaurants = restaurantCollection.docs
+              .map((doc) => Restaurant.fromSnapshot(doc))
+              .toList();
+          yield restaurants;
+        } else {
+          final foodCategory = initialize().collection('foodCategory');
+          final foodCategoryDocsList = await foodCategory
+              .where('name', isEqualTo: foodCategoryName)
+              .get()
+              .then((event) => event.docs);
+          DocumentSnapshot foodCategoryDoc = foodCategoryDocsList[0];
+          final restaurantQuery =
+              await foodCategoryDoc.reference.collection('restaurant').get();
+          final restaurants = restaurantQuery.docs
+              .map((doc) => Restaurant.fromSnapshot(doc))
+              .toList();
+          yield restaurants;
+        }
+      } catch (e) {
+        throw ErrorFetchingFeaturedRestaurant();
+      }
+    }
   }
 }
 

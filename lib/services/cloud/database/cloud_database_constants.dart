@@ -7,3 +7,4 @@ const profileImageUrlFieldName = 'profile_image_url';
 const stateFieldName = 'state';
 const cityFieldName = 'city';
 const streetFieldName = 'street';
+const restaurantFieldName = 'name';

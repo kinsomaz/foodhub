@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
-import 'package:foodhub/views/foodhub/food_caregory.dart';
+import 'package:foodhub/views/foodhub/food_category.dart';
+import 'package:foodhub/views/foodhub/restaurant.dart';
 
 abstract class CloudDatabase {
   Future<void> createNewProfile({
@@ -27,4 +30,7 @@ abstract class CloudDatabase {
     required String ownerUserId,
   });
   Stream<List<FoodCategory>> foodCategory();
+  Stream<List<Restaurant>?> featuredRestaurantsStream({
+    required Stream<String?> foodCategoryNameStream,
+  });
 }
