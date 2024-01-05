@@ -141,14 +141,14 @@ class _AddressViewState extends State<AddressView> {
             appBar: AppBar(
               leading: Padding(
                 padding: const EdgeInsets.only(
-                  right: 5,
+                  right: 9,
                   left: 16,
-                  top: 12,
-                  bottom: 11,
+                  top: 10,
+                  bottom: 16,
                 ),
                 child: Container(
                   height: screenHeight * 0.04,
-                  width: screenWidth * 0.1,
+                  width: screenWidth * 0.08,
                   decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(5.0),
                       color: Colors.white,
@@ -524,6 +524,9 @@ class _AddressViewState extends State<AddressView> {
                         ),
                         cursorColor: const Color(0xFFFE724C),
                         onTap: _onStreetFieldFocus,
+                        onTapOutside: (event) {
+                          _focusNodeStreet.unfocus();
+                        },
                       ),
                     ),
                   )

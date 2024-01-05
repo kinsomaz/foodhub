@@ -8,3 +8,4 @@ const stateFieldName = 'state';
 const cityFieldName = 'city';
 const streetFieldName = 'street';
 const restaurantFieldName = 'name';
+const favouriteRestaurantsFieldName = 'favouriteRestaurants';

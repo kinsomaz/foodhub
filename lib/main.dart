@@ -11,6 +11,8 @@ import 'package:foodhub/views/foodhub/add_new_address_view.dart';
 import 'package:foodhub/views/foodhub/address_search_body.dart';
 import 'package:foodhub/views/foodhub/home_screen_view.dart';
 import 'package:foodhub/views/foodhub/profile_view.dart';
+import 'package:foodhub/views/foodhub/restaurant_profile_screen.dart';
+import 'package:foodhub/views/foodhub/search_food_screen.dart';
 import 'package:foodhub/views/login_view.dart';
 import 'package:foodhub/views/phone_registration_view.dart';
 import 'package:foodhub/views/reset_password_view.dart';
@@ -40,6 +42,8 @@ void main() {
         profileRoute: (context) => const ProfileView(),
         deliveryAddressRoute: (context) => const AddressView(),
         addressSearchRoute: (context) => const AddressSearchScreen(),
+        searchFoodRoute: (context) => const SearchFoodScreen(),
+        restaurantProfileRoute: (context) => const RestaurantProfileScreen(),
       },
     ),
   );

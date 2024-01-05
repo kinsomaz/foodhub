@@ -6,6 +6,8 @@ import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
+import 'package:foodhub/views/foodhub/menu_category.dart';
+import 'package:foodhub/views/foodhub/menu_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 
 class FirebaseCloudDatabase implements CloudDatabase {
@@ -133,6 +135,236 @@ class FirebaseCloudDatabase implements CloudDatabase {
       }
     }
   }
+
+  @override
+  Stream<List<MenuItem>> featuredMenuItem({
+    required String restaurantName,
+  }) {
+    try {
+      final restaurantQuery = initialize().collection('restaurant');
+      return restaurantQuery
+          .where('name', isEqualTo: restaurantName)
+          .snapshots()
+          .asyncMap((restaurantDocs) async {
+        final restaurantDoc = restaurantDocs.docs[0];
+        final menuCollection = restaurantDoc.reference.collection('menus');
+        final featuredMenuItemQuery =
+            await menuCollection.where('tag', isEqualTo: 'featured_item').get();
+
+        List<MenuItem> featuredMenuItemList = featuredMenuItemQuery.docs
+            .map((doc) => MenuItem.fromSnapshot(doc))
+            .toList();
+
+        return featuredMenuItemList;
+      });
+    } catch (e) {
+      throw ErrorFetchingFeaturedMenuItem();
+    }
+  }
+
+  @override
+  Stream<List<MenuCategory>> menuCategory(
+      {required String restaurantName}) async* {
+    final restaurantQuery = initialize().collection('restaurant');
+    final restaurantDocs =
+        await restaurantQuery.where('name', isEqualTo: restaurantName).get();
+    DocumentSnapshot restaurantDoc = restaurantDocs.docs[0];
+    final menuCategoryQuery =
+        restaurantDoc.reference.collection('menuCategory');
+    final menuCategoryDocs = menuCategoryQuery.snapshots();
+    final menuCategoryList = menuCategoryDocs.map((event) =>
+        event.docs.map((doc) => MenuCategory.fromSnapshot(doc)).toList());
+    yield* menuCategoryList;
+  }
+
+  @override
+  Stream<List<MenuItem>?> menuItemsStream({
+    required String restaurantName,
+    required Stream<String?> menuCategoryNameStream,
+  }) async* {
+    await for (var menuCategoryName in menuCategoryNameStream) {
+      try {
+        final restaurantQuery = initialize().collection('restaurant');
+        final restaurantDocs = await restaurantQuery
+            .where('name', isEqualTo: restaurantName)
+            .get()
+            .then((event) => event.docs);
+        DocumentSnapshot restaurantDoc = restaurantDocs[0];
+        if (menuCategoryName == null || menuCategoryName == 'All') {
+          final menuCollection = restaurantDoc.reference.collection('menus');
+          final featuredMenuItemQuery = await menuCollection.get();
+          final featuredMenuItem = featuredMenuItemQuery.docs
+              .map((doc) => MenuItem.fromSnapshot(doc))
+              .toList();
+          yield featuredMenuItem;
+        } else {
+          final menuCollection = restaurantDoc.reference.collection('menus');
+          final featuredMenuItemQuery = await menuCollection
+              .where('category', isEqualTo: menuCategoryName)
+              .get();
+          final featuredMenuItem = featuredMenuItemQuery.docs
+              .map((doc) => MenuItem.fromSnapshot(doc))
+              .toList();
+          yield featuredMenuItem;
+        }
+      } catch (e) {
+        throw ErrorFetchingMenuItem();
+      }
+    }
+  }
+
+  @override
+  Stream<List<Restaurant>?> searchForRestaurant({
+    required Stream<String> searchTextStream,
+  }) {
+    return searchTextStream.asyncMap((String searchText) async {
+      Set<String> uniqueRestaurantIds = {};
+      List<Restaurant> resultList = [];
+
+      QuerySnapshot<Map<String, dynamic>> foodCategoryQuery =
+          await initialize().collection('foodCategory').get();
+
+      QuerySnapshot<Map<String, dynamic>> restaurantQuery =
+          await initialize().collection('restaurant').get();
+
+      for (var mainDocument in foodCategoryQuery.docs) {
+        if (_documentNameContainsText(mainDocument, searchText)) {
+          QuerySnapshot<Map<String, dynamic>> restaurantQuery =
+              await mainDocument.reference.collection('restaurant').get();
+
+          List<Restaurant> restaurants = restaurantQuery.docs
+              .map((doc) => Restaurant.fromSnapshot(doc))
+              .toList();
+
+          for (var restaurant in restaurants) {
+            if (uniqueRestaurantIds.add(restaurant.name)) {
+              resultList.add(restaurant);
+            }
+          }
+        }
+      }
+
+      for (var mainDocument in restaurantQuery.docs) {
+        if (_documentNameContainsText(mainDocument, searchText)) {
+          Restaurant restaurant = Restaurant.fromSnapshot(mainDocument);
+          if (uniqueRestaurantIds.add(restaurant.name)) {
+            resultList.add(restaurant);
+          }
+        }
+      }
+
+      return resultList;
+    });
+  }
+
+  @override
+  Stream<List<MenuItem>?> searchForFoodItem({
+    required Stream<String> searchTextStream,
+  }) {
+    return searchTextStream.asyncMap((String searchText) async {
+      List<MenuItem> resultList = [];
+
+      QuerySnapshot<Map<String, dynamic>> collectionSnapshot =
+          await initialize().collection('restaurant').get();
+
+      for (var document in collectionSnapshot.docs) {
+        List<MenuItem> menuList = await getMenus(document.id);
+        List<MenuItem> list = _containsSearchTextInMenus(menuList, searchText);
+        resultList.addAll(list);
+      }
+
+      return resultList;
+    });
+  }
+
+  @override
+  Future<List<MenuItem>> getMenus(String documentId) async {
+    QuerySnapshot<Map<String, dynamic>> menuSnapshot = await initialize()
+        .collection('restaurant')
+        .doc(documentId)
+        .collection('menus')
+        .get();
+
+    return menuSnapshot.docs
+        .map((menuDoc) => MenuItem.fromSnapshot(menuDoc))
+        .toList();
+  }
+
+  @override
+  Future<void> addOrRemoveFromFavourite({
+    required Restaurant restaurant,
+    required String userId,
+  }) async {
+    try {
+      final userData = await initialize()
+          .collection('profile')
+          .where('user_id', isEqualTo: userId)
+          .get();
+
+      if (userData.docs.isNotEmpty) {
+        final doc = userData.docs[0];
+        final List<dynamic> favouriteRestaurants =
+            (doc.data()['favouriteRestaurants'] as List<dynamic>?)
+                    ?.cast<String>() ??
+                [];
+
+        if (favouriteRestaurants.contains(restaurant.name)) {
+          await doc.reference.update({
+            'favouriteRestaurants': FieldValue.arrayRemove([restaurant.name])
+          });
+        } else {
+          await doc.reference.update({
+            'favouriteRestaurants': FieldValue.arrayUnion([restaurant.name])
+          });
+        }
+      }
+    } catch (e) {
+      throw ErrorUpdatingUsersFavourite();
+    }
+  }
+
+  @override
+  Stream<bool> isRestaurantFavourite({
+    required Restaurant restaurant,
+    required String userId,
+  }) {
+    return initialize()
+        .collection('profile')
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .map((event) {
+      final doc = event.docs[0];
+      final List<dynamic> favouriteRestaurants =
+          (doc.data()['favouriteRestaurants'] as List<dynamic>?)
+                  ?.cast<String>() ??
+              [];
+      if (favouriteRestaurants.contains(restaurant.name)) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+}
+
+List<MenuItem> _containsSearchTextInMenus(
+    List<MenuItem> menuList, String searchText) {
+  // Check if any menu in the list contains the search text
+  return menuList
+      .where((menu) =>
+          menu.name.toLowerCase().contains(searchText.toLowerCase()) ||
+          menu.ingredients.toLowerCase().contains(searchText.toLowerCase()))
+      .toList();
+}
+
+bool _documentNameContainsText(DocumentSnapshot document, String searchText) {
+  Map<String, dynamic> data = document.data() as Map<String, dynamic>;
+  final value = data['name'];
+  if (value.toString().toLowerCase().contains(searchText.toLowerCase())) {
+    return true;
+  }
+
+  return false;
 }
 
 Future<List<Map<String, dynamic>>> _getDocument(

@@ -3,15 +3,18 @@ import 'package:flutter/material.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 
 typedef FoodCategoryCallback = void Function(FoodCategory foodCategory);
+typedef FoodCategorySecondCallback = void Function();
 
 class FoodCategoryListView extends StatefulWidget {
   final Iterable<FoodCategory> foodCategories;
   final FoodCategoryCallback onTap;
+  final FoodCategorySecondCallback onSecondTap;
 
   const FoodCategoryListView({
     super.key,
     required this.foodCategories,
     required this.onTap,
+    required this.onSecondTap,
   });
 
   @override
@@ -33,9 +36,14 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
         return GestureDetector(
           onTap: () {
             setState(() {
-              selectedIdx = index;
+              if (selectedIdx == index) {
+                selectedIdx = -1;
+                widget.onSecondTap();
+              } else {
+                selectedIdx = index;
+                widget.onTap(foodCategory);
+              }
             });
-            widget.onTap(foodCategory);
           },
           child: Padding(
             padding: EdgeInsets.all(screenWidth * 0.025),
@@ -82,7 +90,7 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
                     foodCategory.name,
                     style: TextStyle(
                       color: index == selectedIdx
-                          ? const Color(0xFFFFFFFFF)
+                          ? const Color(0xFFFFFFFF)
                           : const Color(0xFF67666D),
                       fontSize: 10,
                       fontWeight: FontWeight.w500,

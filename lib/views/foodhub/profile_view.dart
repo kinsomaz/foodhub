@@ -150,8 +150,8 @@ class _ProfileViewState extends State<ProfileView> {
                           left: screenWidth * 0.05,
                         ),
                         child: Container(
-                          height: screenHeight * 0.045,
-                          width: screenWidth * 0.1,
+                          height: screenHeight * 0.041,
+                          width: screenWidth * 0.08,
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5.0),
                               color: Colors.white,

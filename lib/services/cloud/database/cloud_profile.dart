@@ -10,6 +10,7 @@ class CloudProfile {
   final String state;
   final String city;
   final String street;
+  final List<String> favouriteRestaurants;
 
   CloudProfile({
     required this.userName,
@@ -20,6 +21,7 @@ class CloudProfile {
     required this.state,
     required this.city,
     required this.street,
+    required this.favouriteRestaurants,
   });
 
   CloudProfile.fromSnapshot(
@@ -31,5 +33,9 @@ class CloudProfile {
         profileImageUrl = snapshot.data()[profileImageUrlFieldName],
         state = snapshot.data()[stateFieldName],
         city = snapshot.data()[cityFieldName],
-        street = snapshot.data()[streetFieldName];
+        street = snapshot.data()[streetFieldName],
+        favouriteRestaurants =
+            (snapshot.data()[favouriteRestaurantsFieldName] as List<dynamic>?)
+                    ?.cast<String>() ??
+                [];
 }
