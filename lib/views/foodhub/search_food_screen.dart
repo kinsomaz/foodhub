@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
+import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
@@ -18,6 +19,7 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
     with SingleTickerProviderStateMixin {
   late final TextEditingController _searchController;
   late final FirebaseCloudDatabase _cloudServices;
+  late final FirebaseAuthProvider _authProvider;
   late final TabController _tabController;
   late final BehaviorSubject<String> _textSubject;
   final FocusNode _focusNodeSearch = FocusNode();
@@ -29,6 +31,7 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
   void initState() {
     _searchController = TextEditingController();
     _cloudServices = FirebaseCloudDatabase();
+    _authProvider = FirebaseAuthProvider();
     _tabController = TabController(length: 2, vsync: this);
     _textSubject = BehaviorSubject<String>.seeded('_');
 
@@ -284,6 +287,22 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                       SearchMenuItemListView(
                                         menuItems: data,
                                         onTap: (restaurant) {},
+                                        addToFavourite: (MenuItem menuItem) {
+                                          _cloudServices
+                                              .addOrRemoveFavouriteFoodItem(
+                                            menuItem: menuItem,
+                                            userId:
+                                                _authProvider.currentUser!.uid,
+                                          );
+                                        },
+                                        isFavourite: (MenuItem menuItem) {
+                                          return _cloudServices
+                                              .isFoodItemFavourite(
+                                            menuItem: menuItem,
+                                            userId:
+                                                _authProvider.currentUser!.uid,
+                                          );
+                                        },
                                       ),
                                       SizedBox(
                                         height: screenHeight * 0.01,
@@ -348,6 +367,23 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                       SearchRestaurantListView(
                                         restaurants: data,
                                         onTap: (restaurant) {},
+                                        addToFavourite:
+                                            (Restaurant restaurant) {
+                                          _cloudServices
+                                              .addOrRemoveFavouriteRestaurant(
+                                            restaurant: restaurant,
+                                            userId:
+                                                _authProvider.currentUser!.uid,
+                                          );
+                                        },
+                                        isFavourite: (Restaurant restaurant) {
+                                          return _cloudServices
+                                              .isRestaurantFavourite(
+                                            restaurant: restaurant,
+                                            userId:
+                                                _authProvider.currentUser!.uid,
+                                          );
+                                        },
                                       ),
                                       SizedBox(
                                         height: screenHeight * 0.01,

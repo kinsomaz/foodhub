@@ -3,15 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:foodhub/views/foodhub/featured_item_list_view.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
 
-typedef SearchMenuItemCallback = void Function(MenuItem menuItem);
+typedef SearchedMenuItemCallback = void Function(MenuItem menuItem);
+
+typedef IsSearchedFoodItemFavouriteCallback = Stream<bool> Function(
+  MenuItem menuItem,
+);
 
 class SearchMenuItemListView extends StatefulWidget {
   final List<MenuItem> menuItems;
-  final SearchMenuItemCallback onTap;
+  final SearchedMenuItemCallback onTap;
+  final SearchedMenuItemCallback addToFavourite;
+  final IsSearchedFoodItemFavouriteCallback isFavourite;
   const SearchMenuItemListView({
     super.key,
     required this.menuItems,
     required this.onTap,
+    required this.addToFavourite,
+    required this.isFavourite,
   });
 
   @override
@@ -46,7 +54,7 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
         ),
         ...widget.menuItems.map(
           (menuItem) => Container(
-            height: screenHeight * 0.22,
+            height: screenHeight * 0.27,
             width: screenWidth * 0.41,
             margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.025),
             decoration: BoxDecoration(
@@ -63,42 +71,186 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
             ),
             child: Column(
               children: [
-                CachedNetworkImage(
-                  imageUrl: imageUrl,
-                  imageBuilder: (context, imageProvider) => Container(
-                    height: screenHeight * 0.15,
-                    width: screenWidth * 0.41,
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
+                Stack(
+                  children: [
+                    CachedNetworkImage(
+                      imageUrl: imageUrl,
+                      imageBuilder: (context, imageProvider) => Container(
+                        height: screenHeight * 0.19,
+                        width: screenWidth * 0.41,
+                        decoration: const BoxDecoration(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                          child: Image(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      placeholder: (context, url) => Container(
+                        height: screenHeight * 0.15,
+                        width: screenWidth * 0.41,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withAlpha(10),
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(15),
+                            topRight: Radius.circular(15),
+                          ),
+                        ),
                       ),
                     ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                      ),
-                      child: Image(
-                        image: imageProvider,
-                        fit: BoxFit.cover,
+                    Positioned(
+                      top: 10,
+                      left: 10,
+                      child: Container(
+                        height: 27,
+                        width: 53,
+                        decoration: const BoxDecoration(
+                            shape: BoxShape.rectangle,
+                            borderRadius: BorderRadius.all(Radius.circular(20)),
+                            color: Color(0xFFFFFFFF)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(
+                              Icons.attach_money,
+                              size: 17,
+                              color: Color(0xFFFE724C),
+                            ),
+                            Text(
+                              menuItem.price,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  placeholder: (context, url) => Container(
-                    height: screenHeight * 0.15,
-                    width: screenWidth * 0.41,
-                    decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(10),
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                      ),
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: StreamBuilder(
+                          stream: widget.isFavourite(menuItem),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case (ConnectionState.waiting):
+                              case (ConnectionState.active):
+                                if (snapshot.hasData) {
+                                  if (snapshot.data == true) {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        widget.addToFavourite(menuItem);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.only(
+                                          left: 4,
+                                          right: 4,
+                                          top: 5,
+                                          bottom: 4,
+                                        ),
+                                        decoration: const BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Color(0xFFFE724C),
+                                        ),
+                                        child: const Icon(
+                                          Icons.favorite_rounded,
+                                          color: Color(0xFFFFFFFF),
+                                          size: 18,
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    return GestureDetector(
+                                      onTap: () {
+                                        widget.addToFavourite(menuItem);
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.only(
+                                          left: 4,
+                                          right: 4,
+                                          top: 5,
+                                          bottom: 4,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: const Color(0xFFFFFFFF)
+                                              .withAlpha(60),
+                                        ),
+                                        child: const Icon(
+                                          Icons.favorite_rounded,
+                                          color: Color(0xFFFFFFFF),
+                                          size: 18,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  return GestureDetector(
+                                    onTap: () {
+                                      widget.addToFavourite(menuItem);
+                                    },
+                                    child: Container(
+                                      padding: const EdgeInsets.only(
+                                        left: 4,
+                                        right: 4,
+                                        top: 5,
+                                        bottom: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: const Color(0xFFFFFFFF)
+                                            .withAlpha(60),
+                                      ),
+                                      child: const Icon(
+                                        Icons.favorite_rounded,
+                                        color: Color(0xFFFFFFFF),
+                                        size: 18,
+                                      ),
+                                    ),
+                                  );
+                                }
+                              default:
+                                return GestureDetector(
+                                  onTap: () {
+                                    widget.addToFavourite(menuItem);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                      top: 5,
+                                      bottom: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          const Color(0xFFFFFFFF).withAlpha(60),
+                                    ),
+                                    child: const Icon(
+                                      Icons.favorite_rounded,
+                                      color: Color(0xFFFFFFFF),
+                                      size: 18,
+                                    ),
+                                  ),
+                                );
+                            }
+                          }),
                     ),
-                  ),
+                  ],
                 ),
                 SizedBox(
-                  height: screenHeight * 0.007,
+                  height: screenHeight * 0.01,
                 ),
                 Padding(
                   padding: EdgeInsets.only(
@@ -110,7 +262,7 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
                     child: Text(
                       menuItem.name,
                       style: const TextStyle(
-                        fontSize: 13,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         fontFamily: 'SofiaPro',
                         color: Color(0xFF000000),

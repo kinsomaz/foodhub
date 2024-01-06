@@ -7,6 +7,7 @@ import 'package:foodhub/helpers/loading/loading_screen_for_menu_category.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_menu_item.dart';
 import 'package:foodhub/icons/custom_delivery_clock_icon.dart';
 import 'package:foodhub/icons/custom_delivery_icon.dart';
+import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/featured_item_list_view.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
@@ -27,11 +28,13 @@ class RestaurantProfileScreen extends StatefulWidget {
 
 class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
   late final FirebaseCloudDatabase _cloudServices;
+  late final FirebaseAuthProvider _authProvider;
   late final StreamController<String?> _menuCategoryNameController;
 
   @override
   void initState() {
     _cloudServices = FirebaseCloudDatabase();
+    _authProvider = FirebaseAuthProvider();
     _menuCategoryNameController = StreamController<String?>.broadcast(
       onListen: () {
         _menuCategoryNameController.sink.add(null);
@@ -77,11 +80,9 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                           bottom: 40,
                         ),
                         decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
-                          ),
-                        ),
+                            borderRadius: BorderRadius.all(
+                          Radius.circular(15),
+                        )),
                         child: ClipRRect(
                           borderRadius: const BorderRadius.all(
                             Radius.circular(15),
@@ -96,9 +97,8 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                         height: screenHeight * 0.185,
                         decoration: BoxDecoration(
                           color: Colors.black.withAlpha(10),
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(15),
-                            topRight: Radius.circular(15),
+                          borderRadius: const BorderRadius.all(
+                            Radius.circular(15),
                           ),
                         ),
                       ),
@@ -156,6 +156,129 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                       ],
                     ),
                   ],
+                ),
+                Positioned(
+                  top: 40,
+                  right: 27,
+                  child: StreamBuilder(
+                      stream: _cloudServices.isRestaurantFavourite(
+                          restaurant: restaurant,
+                          userId: _authProvider.currentUser!.uid),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case (ConnectionState.waiting):
+                          case (ConnectionState.active):
+                            if (snapshot.hasData) {
+                              if (snapshot.data == true) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _cloudServices
+                                        .addOrRemoveFavouriteRestaurant(
+                                            restaurant: restaurant,
+                                            userId:
+                                                _authProvider.currentUser!.uid);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                      top: 5,
+                                      bottom: 4,
+                                    ),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Color(0xFFFE724C),
+                                    ),
+                                    child: const Icon(
+                                      Icons.favorite_rounded,
+                                      color: Color(0xFFFFFFFF),
+                                      size: 18,
+                                    ),
+                                  ),
+                                );
+                              } else {
+                                return GestureDetector(
+                                  onTap: () {
+                                    _cloudServices
+                                        .addOrRemoveFavouriteRestaurant(
+                                            restaurant: restaurant,
+                                            userId:
+                                                _authProvider.currentUser!.uid);
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.only(
+                                      left: 4,
+                                      right: 4,
+                                      top: 5,
+                                      bottom: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color:
+                                          const Color(0xFFFFFFFF).withAlpha(60),
+                                    ),
+                                    child: const Icon(
+                                      Icons.favorite_rounded,
+                                      color: Color(0xFFFFFFFF),
+                                      size: 18,
+                                    ),
+                                  ),
+                                );
+                              }
+                            } else {
+                              return GestureDetector(
+                                onTap: () {
+                                  _cloudServices.addOrRemoveFavouriteRestaurant(
+                                      restaurant: restaurant,
+                                      userId: _authProvider.currentUser!.uid);
+                                },
+                                child: Container(
+                                  padding: const EdgeInsets.only(
+                                    left: 4,
+                                    right: 4,
+                                    top: 5,
+                                    bottom: 4,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color:
+                                        const Color(0xFFFFFFFF).withAlpha(60),
+                                  ),
+                                  child: const Icon(
+                                    Icons.favorite_rounded,
+                                    color: Color(0xFFFFFFFF),
+                                    size: 18,
+                                  ),
+                                ),
+                              );
+                            }
+                          default:
+                            return GestureDetector(
+                              onTap: () {
+                                _cloudServices.addOrRemoveFavouriteRestaurant(
+                                    restaurant: restaurant,
+                                    userId: _authProvider.currentUser!.uid);
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.only(
+                                  left: 4,
+                                  right: 4,
+                                  top: 5,
+                                  bottom: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: const Color(0xFFFFFFFF).withAlpha(60),
+                                ),
+                                child: const Icon(
+                                  Icons.favorite_rounded,
+                                  color: Color(0xFFFFFFFF),
+                                  size: 18,
+                                ),
+                              ),
+                            );
+                        }
+                      }),
                 ),
                 Padding(
                   padding: EdgeInsets.only(
@@ -332,6 +455,18 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                         child: FeaturedItemListView(
                           menuitems: menus,
                           onTap: (menuItem) {},
+                          addToFavourite: (MenuItem menuItem) {
+                            _cloudServices.addOrRemoveFavouriteFoodItem(
+                              menuItem: menuItem,
+                              userId: _authProvider.currentUser!.uid,
+                            );
+                          },
+                          isFavourite: (MenuItem menuItem) {
+                            return _cloudServices.isFoodItemFavourite(
+                              menuItem: menuItem,
+                              userId: _authProvider.currentUser!.uid,
+                            );
+                          },
                         ),
                       );
                     } else {
@@ -408,6 +543,18 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                         child: MenuItemListView(
                           menuItems: menuItems,
                           onTap: (menuItem) {},
+                          addToFavourite: (MenuItem menuItem) {
+                            _cloudServices.addOrRemoveFavouriteFoodItem(
+                              menuItem: menuItem,
+                              userId: _authProvider.currentUser!.uid,
+                            );
+                          },
+                          isFavourite: (MenuItem menuItem) {
+                            return _cloudServices.isFoodItemFavourite(
+                              menuItem: menuItem,
+                              userId: _authProvider.currentUser!.uid,
+                            );
+                          },
                         ),
                       );
                     } else {

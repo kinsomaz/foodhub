@@ -291,7 +291,7 @@ class FirebaseCloudDatabase implements CloudDatabase {
   }
 
   @override
-  Future<void> addOrRemoveFromFavourite({
+  Future<void> addOrRemoveFavouriteRestaurant({
     required Restaurant restaurant,
     required String userId,
   }) async {
@@ -339,6 +339,62 @@ class FirebaseCloudDatabase implements CloudDatabase {
                   ?.cast<String>() ??
               [];
       if (favouriteRestaurants.contains(restaurant.name)) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+  }
+
+  @override
+  Future<void> addOrRemoveFavouriteFoodItem({
+    required MenuItem menuItem,
+    required String userId,
+  }) async {
+    try {
+      final userData = await initialize()
+          .collection('profile')
+          .where('user_id', isEqualTo: userId)
+          .get();
+
+      if (userData.docs.isNotEmpty) {
+        final doc = userData.docs[0];
+        final List<dynamic> favouriteRestaurants =
+            (doc.data()['favouriteFoodItems'] as List<dynamic>?)
+                    ?.cast<String>() ??
+                [];
+
+        if (favouriteRestaurants.contains(menuItem.name)) {
+          await doc.reference.update({
+            'favouriteFoodItems': FieldValue.arrayRemove([menuItem.name])
+          });
+        } else {
+          await doc.reference.update({
+            'favouriteFoodItems': FieldValue.arrayUnion([menuItem.name])
+          });
+        }
+      }
+    } catch (e) {
+      throw ErrorUpdatingUsersFavourite();
+    }
+  }
+
+  @override
+  Stream<bool> isFoodItemFavourite({
+    required MenuItem menuItem,
+    required String userId,
+  }) {
+    return initialize()
+        .collection('profile')
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .map((event) {
+      final doc = event.docs[0];
+      final List<dynamic> favouriteRestaurants =
+          (doc.data()['favouriteFoodItems'] as List<dynamic>?)
+                  ?.cast<String>() ??
+              [];
+      if (favouriteRestaurants.contains(menuItem.name)) {
         return true;
       } else {
         return false;

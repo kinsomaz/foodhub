@@ -18,7 +18,7 @@ Widget buildMenuItemLoadingState(double screenHeight, double screenWidth) {
 
 Widget _buildListItem(double screenHeight, double screenWidth) {
   return Container(
-    height: screenHeight * 0.22,
+    height: screenHeight * 0.27,
     width: screenWidth * 0.41,
     decoration: BoxDecoration(
       color: const Color(0xFFFFFFFF),
@@ -37,7 +37,7 @@ Widget _buildListItem(double screenHeight, double screenWidth) {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          height: screenHeight * 0.15,
+          height: screenHeight * 0.19,
           width: screenWidth * 0.41,
           decoration: BoxDecoration(
             color: Colors.black.withAlpha(10),

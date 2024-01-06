@@ -51,12 +51,20 @@ abstract class CloudDatabase {
   Stream<List<MenuItem>?> searchForFoodItem({
     required Stream<String> searchTextStream,
   });
-  Future<void> addOrRemoveFromFavourite({
+  Future<void> addOrRemoveFavouriteRestaurant({
     required Restaurant restaurant,
     required String userId,
   });
-  Stream<void> isRestaurantFavourite({
+  Stream<bool> isRestaurantFavourite({
     required Restaurant restaurant,
+    required String userId,
+  });
+  Future<void> addOrRemoveFavouriteFoodItem({
+    required MenuItem menuItem,
+    required String userId,
+  });
+  Stream<bool> isFoodItemFavourite({
+    required MenuItem menuItem,
     required String userId,
   });
 

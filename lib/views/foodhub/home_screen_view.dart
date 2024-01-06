@@ -36,7 +36,6 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final StreamController<String> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
-  String currentFoodCategory = "";
 
   @override
   void initState() {
@@ -243,7 +242,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             ),
                             onTap: () {},
                           ),
-                          SizedBox(height: screenHeight * 0.07),
+                          SizedBox(height: screenHeight * 0.04),
                           Padding(
                             padding: EdgeInsets.only(
                               left: screenWidth * 0.04,
@@ -517,7 +516,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                 );
                               },
                               addToFavourite: (Restaurant restaurant) {
-                                _cloudServices.addOrRemoveFromFavourite(
+                                _cloudServices.addOrRemoveFavouriteRestaurant(
                                   restaurant: restaurant,
                                   userId: _authProvider.currentUser!.uid,
                                 );

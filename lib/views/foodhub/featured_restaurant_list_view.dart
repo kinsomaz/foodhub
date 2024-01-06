@@ -83,9 +83,8 @@ class _FeaturedRestaurantListViewState
                             ),
                           ),
                           child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
+                            borderRadius: const BorderRadius.all(
+                              Radius.circular(15),
                             ),
                             child: Image(
                               image: imageProvider,
