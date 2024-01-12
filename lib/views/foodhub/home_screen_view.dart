@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/constants/routes.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_food_category.dart';
+import 'package:foodhub/helpers/loading/loading_screen_for_menu_item.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_restaurant.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
@@ -13,8 +14,11 @@ import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
+import 'package:foodhub/utilities/widget/bottom_navigation_bar.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/food_category_list_view.dart';
+import 'package:foodhub/views/foodhub/menu_item.dart';
+import 'package:foodhub/views/foodhub/popular_item_list_view.dart';
 import 'package:foodhub/views/foodhub/profile_image.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 import 'package:foodhub/views/foodhub/featured_restaurant_list_view.dart';
@@ -36,6 +40,13 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final StreamController<String> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
+  final List<String> routeNames = [
+    homeRoute,
+    trackingRoute,
+    cartRoute,
+    favouriteRoute,
+    ordersRoute,
+  ];
 
   @override
   void initState() {
@@ -242,7 +253,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             ),
                             onTap: () {},
                           ),
-                          SizedBox(height: screenHeight * 0.04),
+                          SizedBox(height: screenHeight * 0.07),
                           Padding(
                             padding: EdgeInsets.only(
                               left: screenWidth * 0.04,
@@ -298,10 +309,9 @@ class _HomeScreenViewState extends State<HomeScreenView>
         body: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
             children: [
               SizedBox(
-                height: screenHeight * 0.01,
+                height: screenHeight * 0.008,
               ),
               Padding(
                 padding: EdgeInsets.only(
@@ -314,7 +324,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                     child: Text(
                       'What would you like to order',
                       style: TextStyle(
-                        fontSize: screenWidth * 0.08,
+                        fontSize: screenWidth * 0.079,
                         fontWeight: FontWeight.w700,
                         fontFamily: 'SofiaPro',
                         color: const Color(0xFF111719),
@@ -540,7 +550,94 @@ class _HomeScreenViewState extends State<HomeScreenView>
                   }
                 },
               ),
+              SizedBox(
+                height: screenHeight * 0.013,
+              ),
+              Padding(
+                padding: EdgeInsets.only(
+                  left: screenWidth * 0.05,
+                ),
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: SizedBox(
+                    width: screenWidth * 0.67,
+                    child: Text(
+                      'Popular Items',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.045,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'SofiaPro',
+                        color: const Color(0xFF323643),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: screenHeight * 0.01,
+              ),
+              StreamBuilder(
+                stream: _cloudServices.popularItemsStream(),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case (ConnectionState.waiting):
+                    case (ConnectionState.active):
+                      if (snapshot.hasData) {
+                        final menuItems = snapshot.data as List<MenuItem>;
+                        return Container(
+                          margin: EdgeInsets.only(
+                            left: screenWidth * 0.025,
+                            right: screenWidth * 0.025,
+                          ),
+                          child: Center(
+                            child: PopularItemListView(
+                              menuItems: menuItems,
+                              onTap: (menuItem) {},
+                              addToFavourite: (MenuItem menuItem) {
+                                _cloudServices.addOrRemoveFavouriteFoodItem(
+                                  menuItem: menuItem,
+                                  userId: _authProvider.currentUser!.uid,
+                                );
+                              },
+                              isFavourite: (MenuItem menuItem) {
+                                return _cloudServices.isFoodItemFavourite(
+                                  menuItem: menuItem,
+                                  userId: _authProvider.currentUser!.uid,
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        return Center(
+                          child: buildMenuItemLoadingState(
+                            screenHeight,
+                            screenWidth,
+                          ),
+                        );
+                      }
+                    default:
+                      return Center(
+                        child: buildMenuItemLoadingState(
+                          screenHeight,
+                          screenWidth,
+                        ),
+                      );
+                  }
+                },
+              )
             ],
+          ),
+        ),
+        bottomNavigationBar: SizedBox(
+          height: 43,
+          child: MyBottomNavigationBar(
+            currentIndex: 0,
+            onTap: (index) {
+              if (index != 0) {
+                Navigator.of(context).pushNamed(routeNames[index]);
+              }
+            },
           ),
         ),
       ),

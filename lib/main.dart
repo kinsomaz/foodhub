@@ -9,10 +9,15 @@ import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/add_new_address_view.dart';
 import 'package:foodhub/views/foodhub/address_search_body.dart';
-import 'package:foodhub/views/foodhub/home_screen.dart';
+import 'package:foodhub/views/foodhub/cart_view.dart';
+import 'package:foodhub/views/foodhub/favourite_food_item.dart';
+import 'package:foodhub/views/foodhub/home_screen_view.dart';
+import 'package:foodhub/views/foodhub/menu_item_details_view.dart';
+import 'package:foodhub/views/foodhub/orders_view.dart';
 import 'package:foodhub/views/foodhub/profile_view.dart';
 import 'package:foodhub/views/foodhub/restaurant_profile_screen.dart';
 import 'package:foodhub/views/foodhub/search_food_screen.dart';
+import 'package:foodhub/views/foodhub/tracking_view.dart';
 import 'package:foodhub/views/login_view.dart';
 import 'package:foodhub/views/phone_registration_view.dart';
 import 'package:foodhub/views/reset_password_view.dart';
@@ -44,6 +49,12 @@ void main() {
         addressSearchRoute: (context) => const AddressSearchScreen(),
         searchFoodRoute: (context) => const SearchFoodScreen(),
         restaurantProfileRoute: (context) => const RestaurantProfileScreen(),
+        favouriteRoute: (context) => const FavouriteFoodItemView(),
+        cartRoute: (context) => const CartView(),
+        ordersRoute: (context) => const OrdersView(),
+        trackingRoute: (context) => const TrackingView(),
+        homeRoute: (context) => const HomeScreenView(),
+        menuItemDetailsRoute: (context) => const MenuItemDetailsView(),
       },
     ),
   );
@@ -68,7 +79,7 @@ class HomePage extends StatelessWidget {
       },
       builder: (context, state) {
         if (state is AuthStateLoggedIn) {
-          return const HomeScreen();
+          return const HomeScreenView();
         } else if (state is AuthStateEmailNeedsVerification) {
           return const EmailVerificationView();
         } else if (state is AuthStatePhoneRegistration) {

@@ -5,6 +5,7 @@ import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
+import 'package:foodhub/views/foodhub/add_on.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
@@ -390,16 +391,173 @@ class FirebaseCloudDatabase implements CloudDatabase {
         .snapshots()
         .map((event) {
       final doc = event.docs[0];
-      final List<dynamic> favouriteRestaurants =
+      final List<dynamic> favouriteFoodItem =
           (doc.data()['favouriteFoodItems'] as List<dynamic>?)
                   ?.cast<String>() ??
               [];
-      if (favouriteRestaurants.contains(menuItem.name)) {
+      if (favouriteFoodItem.contains(menuItem.name)) {
         return true;
       } else {
         return false;
       }
     });
+  }
+
+  @override
+  Stream<List<MenuItem>> favouriteMenuItem({
+    required String userId,
+  }) {
+    final profile = initialize().collection('profile');
+    return profile
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((event) async {
+      List<MenuItem> resultList = [];
+      final profileDoc = event.docs[0];
+      final List<dynamic> favouriteFoodItem =
+          (profileDoc.data()['favouriteFoodItems'] as List<dynamic>?)
+                  ?.cast<String>() ??
+              [];
+      QuerySnapshot<Map<String, dynamic>> restaurantSnapshot =
+          await initialize().collection('restaurant').get();
+
+      for (var document in restaurantSnapshot.docs) {
+        List<MenuItem> menuList = await getFavouriteMenus(
+          documentId: document.id,
+          itemNameList: favouriteFoodItem,
+        );
+        resultList.addAll(menuList);
+      }
+      return resultList;
+    });
+  }
+
+  @override
+  Future<List<MenuItem>> getFavouriteMenus({
+    required String documentId,
+    required List itemNameList,
+  }) async {
+    QuerySnapshot<Map<String, dynamic>> menuSnapshot = await initialize()
+        .collection('restaurant')
+        .doc(documentId)
+        .collection('menus')
+        .where('name', whereIn: itemNameList)
+        .get();
+
+    return menuSnapshot.docs
+        .map((menuDoc) => MenuItem.fromSnapshot(menuDoc))
+        .toList();
+  }
+
+  @override
+  Stream<List<Restaurant>?> favouriteRestaurants({
+    required String userId,
+  }) {
+    final profile = initialize().collection('profile');
+    return profile
+        .where('user_id', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((event) async {
+      final profileDoc = event.docs[0];
+      final List<dynamic> favouriteRestaurants =
+          (profileDoc.data()['favouriteRestaurants'] as List<dynamic>?)
+                  ?.cast<String>() ??
+              [];
+      final restaurantCollection = await initialize()
+          .collection('restaurant')
+          .where('name', whereIn: favouriteRestaurants)
+          .get();
+      return restaurantCollection.docs
+          .map((doc) => Restaurant.fromSnapshot(doc))
+          .toList();
+    });
+  }
+
+  @override
+  Stream<List<MenuItem>?> popularItemsStream() {
+    return initialize()
+        .collection('restaurant')
+        .snapshots()
+        .asyncMap((event) async {
+      List<MenuItem> resultList = [];
+      final restaurantdocuments = event.docs;
+      for (var document in restaurantdocuments) {
+        List<MenuItem> menuList = await getPopularMenus(
+          documentId: document.id,
+        );
+        resultList.addAll(menuList);
+      }
+      resultList.shuffle();
+      return resultList;
+    });
+  }
+
+  @override
+  Future<List<MenuItem>> getPopularMenus({
+    required String documentId,
+  }) async {
+    QuerySnapshot<Map<String, dynamic>> menuSnapshot = await initialize()
+        .collection('restaurant')
+        .doc(documentId)
+        .collection('menus')
+        .where('tag', isEqualTo: 'featured_item')
+        .get();
+
+    return menuSnapshot.docs
+        .map((menuDoc) => MenuItem.fromSnapshot(menuDoc))
+        .toList();
+  }
+
+  @override
+  Stream<List<AddOn>> getMenuAddOns({
+    required String menuName,
+  }) {
+    return initialize()
+        .collection('restaurant')
+        .snapshots()
+        .asyncExpand((event) async* {
+      for (var doc in event.docs) {
+        final data = await getMenuAddOnsFromEachDoc(
+          documentId: doc.id,
+          menuName: menuName,
+        );
+        if (data != null) {
+          yield data;
+        }
+      }
+    });
+  }
+
+  @override
+  Future<List<AddOn>?> getMenuAddOnsFromEachDoc({
+    required String documentId,
+    required String menuName,
+  }) async {
+    final menu = await initialize()
+        .collection('restaurant')
+        .doc(documentId)
+        .collection('menus')
+        .where('name', isEqualTo: menuName)
+        .get();
+    final menuDocs = menu.docs;
+    if (menuDocs.isNotEmpty) {
+      return await initialize()
+          .collection('restaurant')
+          .doc(documentId)
+          .collection('menus')
+          .doc(menuDocs[0].id)
+          .collection('addOn')
+          .get()
+          .then(
+            (value) => value.docs
+                .map(
+                  (doc) => AddOn.fromSnapshot(doc),
+                )
+                .toList(),
+          );
+    } else {
+      return null;
+    }
   }
 }
 

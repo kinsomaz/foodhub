@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:foodhub/icons/custom_cart_icon.dart';
+import 'package:foodhub/icons/custom_home_icon.dart';
+import 'package:foodhub/icons/custom_order_history_icon.dart';
+import 'package:foodhub/icons/custom_tracking_icon.dart';
 
 class MyBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
@@ -27,15 +31,15 @@ class MyBottomNavigationBar extends StatelessWidget {
       onTap: onTap,
       items: const [
         BottomNavigationBarItem(
-          icon: Icon(Icons.home),
+          icon: CustomHomeIcon(),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.location_on),
+          icon: CustomTrackingIcon(),
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.local_mall),
+          icon: CustomCartIcon(),
           label: '',
         ),
         BottomNavigationBarItem(
@@ -43,7 +47,7 @@ class MyBottomNavigationBar extends StatelessWidget {
           label: '',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.alarm),
+          icon: CustomOrderHistoryIcon(),
           label: '',
         ),
       ],

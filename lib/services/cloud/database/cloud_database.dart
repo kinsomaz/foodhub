@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
+import 'package:foodhub/views/foodhub/add_on.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
@@ -51,6 +52,7 @@ abstract class CloudDatabase {
   Stream<List<MenuItem>?> searchForFoodItem({
     required Stream<String> searchTextStream,
   });
+  Future<List<MenuItem>> getMenus(String documentId);
   Future<void> addOrRemoveFavouriteRestaurant({
     required Restaurant restaurant,
     required String userId,
@@ -67,6 +69,25 @@ abstract class CloudDatabase {
     required MenuItem menuItem,
     required String userId,
   });
-
-  Future<List<MenuItem>> getMenus(String documentId);
+  Stream<List<MenuItem>> favouriteMenuItem({
+    required String userId,
+  });
+  Future<List<MenuItem>> getFavouriteMenus({
+    required String documentId,
+    required List<dynamic> itemNameList,
+  });
+  Stream<List<Restaurant>?> favouriteRestaurants({
+    required String userId,
+  });
+  Stream<List<MenuItem>?> popularItemsStream();
+  Future<List<MenuItem>> getPopularMenus({
+    required String documentId,
+  });
+  Stream<List<AddOn>> getMenuAddOns({
+    required String menuName,
+  });
+  Future<List<AddOn>?> getMenuAddOnsFromEachDoc({
+    required String documentId,
+    required String menuName,
+  });
 }

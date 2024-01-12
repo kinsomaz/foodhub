@@ -7,6 +7,7 @@ class MenuItem {
   final String ingredients;
   final String category;
   final String tag;
+  final String description;
 
   MenuItem({
     required this.name,
@@ -15,6 +16,7 @@ class MenuItem {
     required this.ingredients,
     required this.category,
     required this.tag,
+    required this.description,
   });
 
   MenuItem.fromSnapshot(QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
@@ -23,5 +25,6 @@ class MenuItem {
         price = snapshot.data()['price'] ?? '',
         ingredients = snapshot.data()['ingredients'] ?? '',
         category = snapshot.data()['category'] ?? '',
-        tag = snapshot.data()['tag'] ?? '';
+        tag = snapshot.data()['tag'] ?? '',
+        description = snapshot.data()['description'] ?? '';
 }

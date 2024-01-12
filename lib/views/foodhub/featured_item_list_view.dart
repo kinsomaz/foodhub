@@ -47,7 +47,7 @@ class _FeaturedItemListViewState extends State<FeaturedItemListView> {
               screenWidth * 0.025,
             ),
             child: Container(
-              height: screenHeight * 0.25,
+              height: screenHeight * 0.27,
               width: screenWidth * 0.7,
               decoration: BoxDecoration(
                 color: const Color(0xFFFFFFFF),
