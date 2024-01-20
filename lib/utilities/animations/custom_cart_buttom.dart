@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/icons/custom_cart_icon.dart';
 
+typedef AddToCartCallback = void Function();
+
 class CustomCartButton extends StatefulWidget {
-  const CustomCartButton({super.key});
+  final AddToCartCallback addToCart;
+  const CustomCartButton({
+    super.key,
+    required this.addToCart,
+  });
 
   @override
   State<CustomCartButton> createState() => _CustomCartButtonState();
@@ -90,8 +96,10 @@ class _CustomCartButtonState extends State<CustomCartButton>
         ),
       ),
       onPressed: () {
-        _animationController.forward();
-        // Perform your add to cart logic here
+        _animationController.forward().whenCompleteOrCancel(() {
+          widget.addToCart();
+          Navigator.of(context).pop();
+        });
       },
     );
   }

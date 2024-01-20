@@ -5,7 +5,6 @@ class Restaurant {
   final String imageUrl;
   final String logo;
   final bool isVerified;
-  final String deliveryFee;
   final String deliveryTime;
   final List<String> tags;
 
@@ -14,7 +13,6 @@ class Restaurant {
     required this.imageUrl,
     required this.logo,
     required this.isVerified,
-    required this.deliveryFee,
     required this.deliveryTime,
     required this.tags,
   });
@@ -24,7 +22,6 @@ class Restaurant {
         imageUrl = snapshot.data()['imageUrl'] ?? '',
         isVerified = snapshot.data()['isVerified'] ?? '',
         logo = snapshot.data()['logo'],
-        deliveryFee = snapshot.data()['deliveryFee'] ?? '',
         deliveryTime = snapshot.data()['deliveryTime'] ?? '',
         tags = (snapshot.data()['tag'] as List<dynamic>?)?.cast<String>() ?? [];
 }

@@ -6,15 +6,20 @@ import 'package:foodhub/views/foodhub/restaurant.dart';
 import 'package:foodhub/views/foodhub/restaurant_tag_list_view.dart';
 
 typedef FavouriteRestaurantCallback = void Function(Restaurant restaurant);
+typedef GetRestaurantFeeCallback = Stream<Map> Function(
+  String restaurantName,
+);
 
 class FavouriteRestaurantListView extends StatefulWidget {
   final Iterable<Restaurant> restaurants;
   final FavouriteRestaurantCallback onTap;
+  final GetRestaurantFeeCallback getRestaurantFee;
 
   const FavouriteRestaurantListView({
     super.key,
     required this.restaurants,
     required this.onTap,
+    required this.getRestaurantFee,
   });
 
   @override
@@ -170,14 +175,32 @@ class _FavouriteRestaurantListViewState
                         ),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            restaurant.deliveryFee,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'HelveticaNeue',
-                              color: Color(0xFF7E8392),
-                            ),
+                          child: StreamBuilder(
+                            stream: widget.getRestaurantFee(restaurant.name),
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case (ConnectionState.waiting):
+                                case (ConnectionState.active):
+                                  if (snapshot.hasData) {
+                                    final data = snapshot.data;
+                                    final amount =
+                                        double.parse(data!['deliveryFee']);
+                                    return Text(
+                                      '\$${amount.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'HelveticaNeue',
+                                        color: Color(0xFF7E8392),
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
+                                default:
+                                  return Container();
+                              }
+                            },
                           ),
                         ),
                       ),

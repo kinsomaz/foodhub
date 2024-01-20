@@ -5,9 +5,9 @@ import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
-import 'package:foodhub/views/foodhub/add_on.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
+import 'package:foodhub/views/foodhub/menu_extra.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 
@@ -509,55 +509,141 @@ class FirebaseCloudDatabase implements CloudDatabase {
   }
 
   @override
-  Stream<List<AddOn>> getMenuAddOns({
+  Stream<List<MenuExtra>> getMenuExtras({
     required String menuName,
+    required String restaurantName,
   }) {
     return initialize()
         .collection('restaurant')
+        .where('name', isEqualTo: restaurantName)
         .snapshots()
-        .asyncExpand((event) async* {
-      for (var doc in event.docs) {
-        final data = await getMenuAddOnsFromEachDoc(
-          documentId: doc.id,
-          menuName: menuName,
-        );
-        if (data != null) {
-          yield data;
-        }
+        .asyncMap((event) async {
+      final restaurantDoc = event.docs[0];
+      final menuCollection = await restaurantDoc.reference
+          .collection('menus')
+          .where('name', isEqualTo: menuName)
+          .get();
+      final menuDoc = menuCollection.docs[0];
+      final extras = (menuDoc.data()['extras'] as List<dynamic>?) ?? [];
+      return extras.map((extra) => MenuExtra.fromSnapshot(extra)).toList();
+    });
+  }
+
+  @override
+  Future<void> addToCart({
+    required String ownerUserId,
+    required String restaurantName,
+    required MenuItem menuItem,
+    required int quatity,
+    required Map<String, Map> extras,
+  }) async {
+    final userCart = initialize().collection('userCart');
+    await userCart.add({
+      'user_id': ownerUserId,
+      'name': restaurantName,
+      'item': {
+        'name': menuItem.name,
+        'price': menuItem.price,
+        'imageUrl': menuItem.imageUrl,
+        'quatity': quatity,
+      },
+      'extra': extras,
+    });
+  }
+
+  @override
+  Stream<List<Map<String, dynamic>>?> getRestaurantCartItems({
+    required String ownerUserId,
+    required String restaurantName,
+  }) {
+    final userCart = initialize().collection('userCart');
+    final userCartCollection = userCart
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .where('name', isEqualTo: restaurantName)
+        .snapshots();
+
+    return userCartCollection.map((event) {
+      if (event.docs.isNotEmpty) {
+        return event.docs.map((doc) => doc.data()).toList();
+      } else {
+        return null;
       }
     });
   }
 
   @override
-  Future<List<AddOn>?> getMenuAddOnsFromEachDoc({
-    required String documentId,
-    required String menuName,
-  }) async {
-    final menu = await initialize()
-        .collection('restaurant')
-        .doc(documentId)
-        .collection('menus')
-        .where('name', isEqualTo: menuName)
+  Future<void> addToItemQuantityInCart({required Map item}) async {
+    final userCart = initialize().collection('userCart');
+    final userCartCollection = await userCart
+        .where('item', isEqualTo: item['item'])
+        .where('extra', isEqualTo: item['extra'])
         .get();
-    final menuDocs = menu.docs;
-    if (menuDocs.isNotEmpty) {
-      return await initialize()
-          .collection('restaurant')
-          .doc(documentId)
-          .collection('menus')
-          .doc(menuDocs[0].id)
-          .collection('addOn')
-          .get()
-          .then(
-            (value) => value.docs
-                .map(
-                  (doc) => AddOn.fromSnapshot(doc),
-                )
-                .toList(),
-          );
-    } else {
-      return null;
+    final doc = userCartCollection.docs[0];
+    await doc.reference.update({'item.quatity': FieldValue.increment(1)});
+  }
+
+  @override
+  Future<void> deleteItemFromCart({required Map item}) async {
+    final userCart = initialize().collection('userCart');
+    final userCartCollection = await userCart
+        .where('item', isEqualTo: item['item'])
+        .where('extra', isEqualTo: item['extra'])
+        .get();
+    final doc = userCartCollection.docs[0];
+    await doc.reference.delete();
+  }
+
+  @override
+  Future<void> subFromItemQuantityInCart({required Map item}) async {
+    final userCart = initialize().collection('userCart');
+    final userCartCollection = await userCart
+        .where('item', isEqualTo: item['item'])
+        .where('extra', isEqualTo: item['extra'])
+        .get();
+    final doc = userCartCollection.docs[0];
+    if (doc.data()['item']['quatity'] > 1) {
+      await doc.reference.update({'item.quatity': FieldValue.increment(-1)});
     }
+    if (doc.data()['item']['quatity'] == 1) {
+      await deleteItemFromCart(item: item);
+    }
+  }
+
+  @override
+  Future<void> setRestaurantFee({
+    required String restaurantName,
+    required String userId,
+  }) async {
+    final calculatedRestaurantFeeCollection =
+        initialize().collection('calculatedRestaurantFee');
+    final documentRef = calculatedRestaurantFeeCollection.doc(userId);
+    final dataToSet = {
+      restaurantName: {
+        'taxAndFees': '3.5',
+        'deliveryFee': '1.00',
+      }
+    };
+    await documentRef.set(
+      dataToSet,
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
+  Stream<Map> getRestaurantFee({
+    required String restaurantName,
+    required String userId,
+  }) {
+    final calculatedRestaurantFeeCollection =
+        initialize().collection('calculatedRestaurantFee');
+    return calculatedRestaurantFeeCollection
+        .doc(userId)
+        .snapshots()
+        .asyncMap((event) {
+      final restaurantData = event.data();
+      final restaurantFee = restaurantData![restaurantName] as Map;
+      return restaurantFee;
+    });
   }
 }
 

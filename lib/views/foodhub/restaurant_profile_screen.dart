@@ -2,12 +2,13 @@ import 'dart:async';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/constants/routes.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_featured_item.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_menu_category.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_menu_item.dart';
 import 'package:foodhub/icons/custom_delivery_clock_icon.dart';
 import 'package:foodhub/icons/custom_delivery_icon.dart';
+import 'package:foodhub/routes/cart_route.dart';
+import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/featured_item_list_view.dart';
@@ -27,10 +28,13 @@ class RestaurantProfileScreen extends StatefulWidget {
       _RestaurantProfileScreenState();
 }
 
-class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
+class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
+    with SingleTickerProviderStateMixin {
   late final FirebaseCloudDatabase _cloudServices;
   late final FirebaseAuthProvider _authProvider;
   late final StreamController<String?> _menuCategoryNameController;
+  late AnimationController _controller;
+  late Animation<Offset> _offsetAnimation;
 
   @override
   void initState() {
@@ -41,12 +45,30 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
         _menuCategoryNameController.sink.add(null);
       },
     );
+    _controller = AnimationController(
+      duration:
+          const Duration(milliseconds: 900), // Adjust the duration as needed
+      vsync: this,
+    );
+    _offsetAnimation = Tween<Offset>(
+      begin: const Offset(0.0, 1.5),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    Future.delayed(const Duration(seconds: 1), () {
+      _controller.forward();
+    });
+
     super.initState();
   }
 
   @override
   void dispose() {
     _menuCategoryNameController.close();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -379,14 +401,35 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                       ),
                       child: Align(
                         alignment: Alignment.centerLeft,
-                        child: Text(
-                          restaurant.deliveryFee,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
-                            fontFamily: 'HelveticaNeue',
-                            color: Color(0xFF7E8392),
+                        child: StreamBuilder(
+                          stream: _cloudServices.getRestaurantFee(
+                            restaurantName: restaurant.name,
+                            userId: _authProvider.currentUser!.uid,
                           ),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case (ConnectionState.waiting):
+                              case (ConnectionState.active):
+                                if (snapshot.hasData) {
+                                  final data = snapshot.data;
+                                  final amount =
+                                      double.parse(data!['deliveryFee']);
+                                  return Text(
+                                    '\$${amount.toStringAsFixed(2)}',
+                                    style: const TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'HelveticaNeue',
+                                      color: Color(0xFF7E8392),
+                                    ),
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              default:
+                                return Container();
+                            }
+                          },
                         ),
                       ),
                     ),
@@ -464,9 +507,8 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                             child: FeaturedItemListView(
                               menuitems: menus,
                               onTap: (menuItem) {
-                                Navigator.of(context).pushNamed(
-                                  menuItemDetailsRoute,
-                                  arguments: [menuItem],
+                                Navigator.of(context).push(
+                                  menuItemDetailsRoute(arguments: [menuItem]),
                                 );
                               },
                               addToFavourite: (MenuItem menuItem) {
@@ -558,9 +600,9 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
                             child: MenuItemListView(
                               menuItems: menuItems,
                               onTap: (menuItem) {
-                                Navigator.of(context).pushNamed(
-                                  menuItemDetailsRoute,
-                                  arguments: [menuItem],
+                                Navigator.of(context).push(
+                                  menuItemDetailsRoute(
+                                      arguments: [menuItem, restaurant]),
                                 );
                               },
                               addToFavourite: (MenuItem menuItem) {
@@ -599,17 +641,131 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen> {
           ),
           Positioned(
             bottom: 5,
-            child: Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Container(
-                width: screenWidth - 40,
-                height: 50,
-                decoration: const BoxDecoration(
-                    color: Color(0xFFFE724C),
-                    borderRadius: BorderRadius.all(
-                      Radius.circular(30),
-                    )),
-              ),
+            child: SlideTransition(
+              position: _offsetAnimation,
+              child: StreamBuilder(
+                  stream: _cloudServices.getRestaurantCartItems(
+                      ownerUserId: _authProvider.currentUser!.uid,
+                      restaurantName: restaurant.name),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case (ConnectionState.waiting):
+                      case (ConnectionState.active):
+                        if (snapshot.hasData) {
+                          if (snapshot.data != null) {
+                            final data = snapshot.data;
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).push(
+                                  cartRoute(arguments: [restaurant]),
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 70.0,
+                                  right: 70.0,
+                                  bottom: 10.0,
+                                ),
+                                child: Container(
+                                  width: screenWidth - 140,
+                                  height: 40,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 15,
+                                  ),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xFFFE724C),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(40),
+                                      )),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      const Text(
+                                        'Order',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: 'SofiaPro',
+                                            color: Color(0xFFFFFFFF)),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      Text(
+                                        '${data!.length}',
+                                        style: const TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: 'SofiaPro',
+                                            color: Color(0xFFFFFFFF)),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      const Text(
+                                        'for',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.w600,
+                                            fontFamily: 'SofiaPro',
+                                            color: Color(0xFFFFFFFF)),
+                                      ),
+                                      const SizedBox(
+                                        width: 6,
+                                      ),
+                                      Builder(
+                                        builder: (context) {
+                                          final listPrice =
+                                              data.map((menuItem) {
+                                            final itemPrice = double.parse(
+                                                menuItem['item']['price']
+                                                    .toString());
+                                            final quatity = double.parse(
+                                                menuItem['item']['quatity']
+                                                    .toString());
+                                            double itemPriceToQuatity =
+                                                itemPrice * quatity;
+                                            final extras =
+                                                menuItem['extra'] as Map;
+                                            for (var key in extras.keys) {
+                                              final extra =
+                                                  extras[key]['price'];
+                                              double price = double.parse(
+                                                  extra.substring(2));
+                                              itemPriceToQuatity +=
+                                                  price * quatity;
+                                            }
+                                            return itemPriceToQuatity;
+                                          }).toList();
+                                          double totalPrice = 0.0;
+                                          for (double price in listPrice) {
+                                            totalPrice += price;
+                                          }
+                                          return Text(
+                                            '\$${totalPrice.toStringAsFixed(2)}',
+                                            style: const TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.w600,
+                                                fontFamily: 'SofiaPro',
+                                                color: Color(0xFFFFFFFF)),
+                                          );
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          } else {
+                            return Container();
+                          }
+                        } else {
+                          return Container();
+                        }
+                      default:
+                        return Container();
+                    }
+                  }),
             ),
           )
         ],

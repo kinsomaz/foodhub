@@ -9,12 +9,20 @@ typedef FeaturedRestaurantCallback = void Function(Restaurant restaurant);
 typedef IsRestaurantFavouriteCallback = Stream<bool> Function(
   Restaurant restaurant,
 );
+typedef CalculateRestaurantFeeCallback = Future<void> Function(
+  String restaurantName,
+);
+typedef GetRestaurantFeeCallback = Stream<Map> Function(
+  String restaurantName,
+);
 
 class FeaturedRestaurantListView extends StatefulWidget {
   final Iterable<Restaurant> restaurants;
   final FeaturedRestaurantCallback onTap;
   final FeaturedRestaurantCallback addToFavourite;
   final IsRestaurantFavouriteCallback isFavourite;
+  final CalculateRestaurantFeeCallback calculateRestaurantFee;
+  final GetRestaurantFeeCallback getRestaurantFee;
 
   const FeaturedRestaurantListView({
     super.key,
@@ -22,6 +30,8 @@ class FeaturedRestaurantListView extends StatefulWidget {
     required this.onTap,
     required this.addToFavourite,
     required this.isFavourite,
+    required this.calculateRestaurantFee,
+    required this.getRestaurantFee,
   });
 
   @override
@@ -266,14 +276,38 @@ class _FeaturedRestaurantListViewState
                         ),
                         child: Align(
                           alignment: Alignment.centerLeft,
-                          child: Text(
-                            restaurant.deliveryFee,
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: 'HelveticaNeue',
-                              color: Color(0xFF7E8392),
-                            ),
+                          child: Builder(
+                            builder: (context) {
+                              widget.calculateRestaurantFee(restaurant.name);
+                              return StreamBuilder(
+                                stream:
+                                    widget.getRestaurantFee(restaurant.name),
+                                builder: (context, snapshot) {
+                                  switch (snapshot.connectionState) {
+                                    case (ConnectionState.waiting):
+                                    case (ConnectionState.active):
+                                      if (snapshot.hasData) {
+                                        final data = snapshot.data;
+                                        final amount =
+                                            double.parse(data!['deliveryFee']);
+                                        return Text(
+                                          '\$${amount.toStringAsFixed(2)}',
+                                          style: const TextStyle(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w400,
+                                            fontFamily: 'HelveticaNeue',
+                                            color: Color(0xFF7E8392),
+                                          ),
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    default:
+                                      return Container();
+                                  }
+                                },
+                              );
+                            },
                           ),
                         ),
                       ),

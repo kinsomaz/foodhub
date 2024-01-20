@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:foodhub/routes/menu_item_details_route.dart';
+import 'package:foodhub/routes/restaurant_profile_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/favourite_item_list_view.dart';
@@ -187,7 +189,11 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
                               ),
                               child: FavouriteItemListView(
                                 menuitems: data,
-                                onTap: (menuItem) {},
+                                onTap: (menuItem) {
+                                  Navigator.of(context).push(
+                                      menuItemDetailsRoute(
+                                          arguments: [menuItem]));
+                                },
                               ),
                             );
                           } else {
@@ -237,7 +243,18 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
                               ),
                               child: FavouriteRestaurantListView(
                                 restaurants: data,
-                                onTap: (restaurant) {},
+                                onTap: (restaurant) {
+                                  Navigator.of(context).push(
+                                    restaurantProfileRoute(
+                                        arguments: [restaurant]),
+                                  );
+                                },
+                                getRestaurantFee: (String restaurantName) {
+                                  return _cloudServices.getRestaurantFee(
+                                    restaurantName: restaurantName,
+                                    userId: _authProvider.currentUser!.uid,
+                                  );
+                                },
                               ),
                             );
                           } else {

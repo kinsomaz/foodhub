@@ -8,6 +8,13 @@ import 'package:foodhub/helpers/loading/loading_screen_for_food_category.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_menu_item.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_restaurant.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
+import 'package:foodhub/routes/cart_route.dart';
+import 'package:foodhub/routes/favourite_route.dart';
+import 'package:foodhub/routes/menu_item_details_route.dart';
+import 'package:foodhub/routes/orders_route.dart';
+import 'package:foodhub/routes/restaurant_profile_route.dart';
+import 'package:foodhub/routes/search_food_route.dart';
+import 'package:foodhub/routes/tracking_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
@@ -40,12 +47,12 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final StreamController<String> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
-  final List<String> routeNames = [
-    homeRoute,
-    trackingRoute,
-    cartRoute,
-    favouriteRoute,
-    ordersRoute,
+  final List<dynamic> route = [
+    null,
+    trackingRoute(),
+    cartRoute(arguments: []),
+    () => favouriteRoute(),
+    ordersRoute(),
   ];
 
   @override
@@ -73,7 +80,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
   }
 
   void _onSearchFieldFocus() {
-    Navigator.of(context).pushNamed(searchFoodRoute);
+    Navigator.of(context).push(searchFoodRoute());
   }
 
   @override
@@ -520,10 +527,9 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             child: FeaturedRestaurantListView(
                               restaurants: restaurants,
                               onTap: (restaurant) {
-                                Navigator.of(context).pushNamed(
-                                  restaurantProfileRoute,
-                                  arguments: [restaurant],
-                                );
+                                Navigator.of(context).push(
+                                    restaurantProfileRoute(
+                                        arguments: [restaurant]));
                               },
                               addToFavourite: (Restaurant restaurant) {
                                 _cloudServices.addOrRemoveFavouriteRestaurant(
@@ -534,6 +540,20 @@ class _HomeScreenViewState extends State<HomeScreenView>
                               isFavourite: (Restaurant restaurant) {
                                 return _cloudServices.isRestaurantFavourite(
                                   restaurant: restaurant,
+                                  userId: _authProvider.currentUser!.uid,
+                                );
+                              },
+                              calculateRestaurantFee: (
+                                String restaurantName,
+                              ) async {
+                                await _cloudServices.setRestaurantFee(
+                                  restaurantName: restaurantName,
+                                  userId: _authProvider.currentUser!.uid,
+                                );
+                              },
+                              getRestaurantFee: (String restaurantName) {
+                                return _cloudServices.getRestaurantFee(
+                                  restaurantName: restaurantName,
                                   userId: _authProvider.currentUser!.uid,
                                 );
                               },
@@ -592,7 +612,11 @@ class _HomeScreenViewState extends State<HomeScreenView>
                           child: Center(
                             child: PopularItemListView(
                               menuItems: menuItems,
-                              onTap: (menuItem) {},
+                              onTap: (menuItem) {
+                                Navigator.of(context).push(
+                                  menuItemDetailsRoute(arguments: [menuItem]),
+                                );
+                              },
                               addToFavourite: (MenuItem menuItem) {
                                 _cloudServices.addOrRemoveFavouriteFoodItem(
                                   menuItem: menuItem,
@@ -625,7 +649,10 @@ class _HomeScreenViewState extends State<HomeScreenView>
                       );
                   }
                 },
-              )
+              ),
+              SizedBox(
+                height: screenHeight * 0.02,
+              ),
             ],
           ),
         ),
@@ -635,7 +662,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
             currentIndex: 0,
             onTap: (index) {
               if (index != 0) {
-                Navigator.of(context).pushNamed(routeNames[index]);
+                Navigator.of(context).push(route[index]()!);
               }
             },
           ),

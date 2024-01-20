@@ -1,40 +1,53 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/add_on.dart';
+import 'package:foodhub/views/foodhub/menu_extra.dart';
 
-typedef AddOnSelected = void Function(int selectedInt);
+typedef ExtraSelected = void Function(int selectedInt);
 
-class AddOnListView extends StatefulWidget {
-  final List<AddOn> addOns;
-  final AddOnSelected onAddOnSelected;
-
-  const AddOnListView({
+class MenuExtraListView extends StatefulWidget {
+  final MenuExtra extra;
+  final ExtraSelected onExtraSelected;
+  const MenuExtraListView({
     super.key,
-    required this.addOns,
-    required this.onAddOnSelected,
+    required this.extra,
+    required this.onExtraSelected,
   });
 
   @override
-  State<AddOnListView> createState() => _AddOnListViewState();
+  State<MenuExtraListView> createState() => _MenuExtraListViewState();
 }
 
-class _AddOnListViewState extends State<AddOnListView> {
+class _MenuExtraListViewState extends State<MenuExtraListView> {
   int selectedAddOnIndex = -1;
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
-
-    return Wrap(
-      children: List.generate(
-        widget.addOns.length,
+    return Wrap(children: [
+      Container(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 6,
+        ),
+        child: Text(
+          widget.extra.title,
+          style: const TextStyle(
+            fontFamily: 'SofiaPro',
+            fontSize: 18,
+            fontWeight: FontWeight.w600,
+            color: Color(0xFF323643),
+          ),
+        ),
+      ),
+      ...List.generate(
+        widget.extra.item.length,
         (index) {
-          final addOn = widget.addOns[index];
+          final extra = widget.extra.item[index];
           return GestureDetector(
             onTap: () {
               setState(() {
                 selectedAddOnIndex = index;
               });
-              widget.onAddOnSelected(selectedAddOnIndex);
+              widget.onExtraSelected(selectedAddOnIndex);
             },
             child: Container(
               width: screenWidth,
@@ -49,28 +62,35 @@ class _AddOnListViewState extends State<AddOnListView> {
                 children: [
                   Row(
                     children: [
-                      CachedNetworkImage(
-                        imageUrl: addOn.image,
-                        imageBuilder: (context, imageProvider) => Container(
-                          height: 43,
-                          width: 45,
-                          padding: const EdgeInsets.all(4.0),
-                          child: Image(
-                            image: imageProvider,
-                            fit: BoxFit.cover,
+                      Visibility(
+                        visible: (extra['image'] ?? '').isNotEmpty,
+                        child: CachedNetworkImage(
+                          imageUrl: extra['image'] ?? '',
+                          imageBuilder: (context, imageProvider) => Container(
+                            height: 35,
+                            width: 40,
+                            padding: const EdgeInsets.only(
+                              right: 4,
+                              top: 4,
+                              bottom: 4,
+                            ),
+                            child: Image(
+                              image: imageProvider,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                        placeholder: (context, url) => Container(
-                          height: 43,
-                          width: 45,
-                          padding: const EdgeInsets.all(4.0),
+                          placeholder: (context, url) => Container(
+                            height: 35,
+                            width: 40,
+                            padding: const EdgeInsets.all(4.0),
+                          ),
                         ),
                       ),
                       const SizedBox(
-                        width: 5,
+                        width: 10,
                       ),
                       Text(
-                        addOn.name,
+                        extra['name'] ?? '',
                         style: const TextStyle(
                           fontFamily: 'HelveticaNeue',
                           fontSize: 14,
@@ -83,7 +103,7 @@ class _AddOnListViewState extends State<AddOnListView> {
                   Row(
                     children: [
                       Text(
-                        addOn.price,
+                        extra['price'] ?? '',
                         style: const TextStyle(
                           fontFamily: 'HelveticaNeue',
                           fontSize: 14,
@@ -109,6 +129,6 @@ class _AddOnListViewState extends State<AddOnListView> {
           );
         },
       ),
-    );
+    ]);
   }
 }

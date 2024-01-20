@@ -238,18 +238,21 @@ class _MenuItemListViewState extends State<MenuItemListView> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    left: screenWidth * 0.03,
+                    left: screenWidth * 0.02,
                     right: screenWidth * 0.015,
                   ),
                   child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      menuItem.name,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        fontFamily: 'SofiaPro',
-                        color: Color(0xFF000000),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        menuItem.name,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          fontFamily: 'SofiaPro',
+                          color: Color(0xFF000000),
+                        ),
                       ),
                     ),
                   ),
@@ -259,17 +262,20 @@ class _MenuItemListViewState extends State<MenuItemListView> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                    left: screenWidth * 0.03,
+                    left: screenWidth * 0.02,
                   ),
-                  child: const Align(
+                  child: Align(
                     alignment: Alignment.centerLeft,
-                    child: Text(
-                      '',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w400,
-                        fontFamily: 'HelveticaNeue',
-                        color: Color(0xFF7E8392),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Text(
+                        menuItem.ingredients,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w400,
+                          fontFamily: 'HelveticaNeue',
+                          color: Color(0xFF7E8392),
+                        ),
                       ),
                     ),
                   ),

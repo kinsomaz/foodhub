@@ -267,14 +267,14 @@ class _FeaturedItemListViewState extends State<FeaturedItemListView> {
                     padding: EdgeInsets.only(
                       left: screenWidth * 0.03,
                     ),
-                    child: const Align(
+                    child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        '',
-                        style: TextStyle(
+                        menuItem.ingredients,
+                        style: const TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.w400,
-                          fontFamily: 'HelveticaNeue',
+                          fontFamily: 'SofiaPro',
                           color: Color(0xFF7E8392),
                         ),
                       ),

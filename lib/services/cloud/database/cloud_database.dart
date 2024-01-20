@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
-import 'package:foodhub/views/foodhub/add_on.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
+import 'package:foodhub/views/foodhub/menu_extra.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 
@@ -83,11 +83,40 @@ abstract class CloudDatabase {
   Future<List<MenuItem>> getPopularMenus({
     required String documentId,
   });
-  Stream<List<AddOn>> getMenuAddOns({
+
+  Stream<List<MenuExtra>> getMenuExtras({
     required String menuName,
+    required String restaurantName,
   });
-  Future<List<AddOn>?> getMenuAddOnsFromEachDoc({
-    required String documentId,
-    required String menuName,
+
+  Future<void> addToCart({
+    required String ownerUserId,
+    required String restaurantName,
+    required MenuItem menuItem,
+    required int quatity,
+    required Map<String, Map> extras,
+  });
+
+  Stream<dynamic> getRestaurantCartItems({
+    required String ownerUserId,
+    required String restaurantName,
+  });
+
+  Future<void> addToItemQuantityInCart({
+    required Map item,
+  });
+  Future<void> subFromItemQuantityInCart({
+    required Map item,
+  });
+  Future<void> deleteItemFromCart({
+    required Map item,
+  });
+  Future<void> setRestaurantFee({
+    required String restaurantName,
+    required String userId,
+  });
+  Stream<Map> getRestaurantFee({
+    required String restaurantName,
+    required String userId,
   });
 }

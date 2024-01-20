@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
+import 'package:foodhub/routes/menu_item_details_route.dart';
+import 'package:foodhub/routes/restaurant_profile_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
@@ -286,7 +288,12 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                     children: [
                                       SearchMenuItemListView(
                                         menuItems: data,
-                                        onTap: (restaurant) {},
+                                        onTap: (MenuItem menuItem) {
+                                          Navigator.of(context).push(
+                                            menuItemDetailsRoute(
+                                                arguments: [menuItem]),
+                                          );
+                                        },
                                         addToFavourite: (MenuItem menuItem) {
                                           _cloudServices
                                               .addOrRemoveFavouriteFoodItem(
@@ -366,7 +373,11 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                     children: [
                                       SearchRestaurantListView(
                                         restaurants: data,
-                                        onTap: (restaurant) {},
+                                        onTap: (restaurant) {
+                                          Navigator.of(context).push(
+                                              restaurantProfileRoute(
+                                                  arguments: [restaurant]));
+                                        },
                                         addToFavourite:
                                             (Restaurant restaurant) {
                                           _cloudServices
@@ -380,6 +391,15 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                           return _cloudServices
                                               .isRestaurantFavourite(
                                             restaurant: restaurant,
+                                            userId:
+                                                _authProvider.currentUser!.uid,
+                                          );
+                                        },
+                                        getRestaurantFee:
+                                            (String restaurantName) {
+                                          return _cloudServices
+                                              .getRestaurantFee(
+                                            restaurantName: restaurantName,
                                             userId:
                                                 _authProvider.currentUser!.uid,
                                           );
