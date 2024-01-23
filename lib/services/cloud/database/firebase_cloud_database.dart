@@ -394,7 +394,7 @@ class FirebaseCloudDatabase implements CloudDatabase {
   }
 
   @override
-  Stream<List<MenuItem>> favouriteMenuItem({
+  Stream<List<MenuItem>?> favouriteMenuItem({
     required String userId,
   }) {
     final profile = initialize().collection('profile');
@@ -410,15 +410,17 @@ class FirebaseCloudDatabase implements CloudDatabase {
               [];
       QuerySnapshot<Map<String, dynamic>> restaurantSnapshot =
           await initialize().collection('restaurant').get();
-
-      for (var document in restaurantSnapshot.docs) {
-        List<MenuItem> menuList = await getFavouriteMenus(
-          documentId: document.id,
-          itemNameList: favouriteFoodItem,
-        );
-        resultList.addAll(menuList);
+      if (favouriteFoodItem.isNotEmpty) {
+        for (var document in restaurantSnapshot.docs) {
+          List<MenuItem> menuList = await getFavouriteMenus(
+            documentId: document.id,
+            itemNameList: favouriteFoodItem,
+          );
+          resultList.addAll(menuList);
+        }
+        return resultList;
       }
-      return resultList;
+      return null;
     });
   }
 
@@ -453,13 +455,17 @@ class FirebaseCloudDatabase implements CloudDatabase {
           (profileDoc.data()['favouriteRestaurants'] as List<dynamic>?)
                   ?.cast<String>() ??
               [];
-      final restaurantCollection = await initialize()
-          .collection('restaurant')
-          .where('name', whereIn: favouriteRestaurants)
-          .get();
-      return restaurantCollection.docs
-          .map((doc) => Restaurant.fromSnapshot(doc))
-          .toList();
+      if (favouriteRestaurants.isNotEmpty) {
+        final restaurantCollection = await initialize()
+            .collection('restaurant')
+            .where('name', whereIn: favouriteRestaurants)
+            .get();
+        return restaurantCollection.docs
+            .map((doc) => Restaurant.fromSnapshot(doc))
+            .toList();
+      } else {
+        return null;
+      }
     });
   }
 

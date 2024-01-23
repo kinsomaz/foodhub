@@ -158,10 +158,10 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
                 isLoading: false,
               ),
             );
-          } on FirebaseAuthException catch (e) {
+          } on Exception catch (e) {
             emit(AuthStatePhoneRegistration(
-              isLoading: false,
               exception: e,
+              isLoading: false,
             ));
           }
         }
@@ -213,7 +213,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
                     isLoading: false,
                   ),
                 );
-              } on FirebaseAuthException catch (e) {
+              } on Exception catch (e) {
                 emit(
                   AuthStatePhoneNeedsVerification(
                     exception: e,

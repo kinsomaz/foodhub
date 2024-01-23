@@ -121,8 +121,6 @@ class FirebaseAuthProvider implements AuthenticationProvider {
         default:
           throw GenericAuthException();
       }
-    } catch (_) {
-      throw GenericAuthException();
     }
   }
 
@@ -158,8 +156,6 @@ class FirebaseAuthProvider implements AuthenticationProvider {
             default:
               throw GenericAuthException();
           }
-        } catch (_) {
-          throw GenericAuthException();
         }
         // ignore: use_build_context_synchronously
         context.read<FoodHubBloc>().add(
@@ -212,8 +208,6 @@ class FirebaseAuthProvider implements AuthenticationProvider {
       } else {
         throw GenericAuthException();
       }
-    } catch (_) {
-      throw GenericAuthException();
     }
   }
 }

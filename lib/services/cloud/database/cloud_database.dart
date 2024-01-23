@@ -66,7 +66,7 @@ abstract class CloudDatabase {
     required MenuItem menuItem,
     required String userId,
   });
-  Stream<List<MenuItem>> favouriteMenuItem({
+  Stream<List<MenuItem>?> favouriteMenuItem({
     required String userId,
   });
   Future<List<MenuItem>> getFavouriteMenus({
