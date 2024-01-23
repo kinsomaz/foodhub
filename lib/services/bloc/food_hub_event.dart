@@ -16,18 +16,8 @@ class AuthEventLogIn extends FoodHubEvent {
   const AuthEventLogIn(this.email, this.password);
 }
 
-class AuthEventVerifyEmailCode extends FoodHubEvent {
-  final String codeOne;
-  final String codeTwo;
-  final String codeThree;
-  final String codeFour;
-
-  const AuthEventVerifyEmailCode({
-    required this.codeOne,
-    required this.codeTwo,
-    required this.codeThree,
-    required this.codeFour,
-  });
+class AuthEventResendEmailVerification extends FoodHubEvent {
+  const AuthEventResendEmailVerification();
 }
 
 class AuthEventVerifyPhoneCode extends FoodHubEvent {
@@ -54,6 +44,10 @@ class AuthEventVerifyPhone extends FoodHubEvent {
   const AuthEventVerifyPhone({
     required this.phoneNumber,
   });
+}
+
+class AuthEventPhoneView extends FoodHubEvent {
+  const AuthEventPhoneView();
 }
 
 class AuthEventRegister extends FoodHubEvent {

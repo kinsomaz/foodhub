@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/icons/custom_facebook_icon.dart';
+import 'package:foodhub/icons/custom_google_icon.dart';
 import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/utilities/dialogs/error_dialog.dart';
-import 'package:foodhub/views/verification/verification_exception.dart';
 
 class SignUpView extends StatefulWidget {
   const SignUpView({super.key});
@@ -67,9 +68,9 @@ class _SignUpViewState extends State<SignUpView> {
             await showErrorDialog(context, 'This is an invalid email address');
           } else if (state.exception is GenericAuthException) {
             await showErrorDialog(context, 'Failed to register');
-          } else if (state.exception is EmailVerificationCodeException) {
+          } else if (state.exception is UpdateIsEmailVerifiedException) {
             await showErrorDialog(
-                context, "Make sure you're connected to the internet");
+                context, "Can't send email verification link ");
           }
         }
       },
@@ -409,10 +410,7 @@ class _SignUpViewState extends State<SignUpView> {
                               ]),
                           child: TextButton.icon(
                             onPressed: () {},
-                            icon: Icon(
-                              Icons.face,
-                              size: screenWidth * 0.09,
-                            ),
+                            icon: const CustomFacebookIcon(),
                             label: Text(
                               'FACEBOOK',
                               style: TextStyle(
@@ -445,10 +443,7 @@ class _SignUpViewState extends State<SignUpView> {
                                     const AuthEventGoogleSignIn(),
                                   );
                             },
-                            icon: Icon(
-                              Icons.face,
-                              size: screenWidth * 0.09,
-                            ),
+                            icon: const CustomGoogleIcon(),
                             label: Text(
                               ' GOOGLE ',
                               style: TextStyle(

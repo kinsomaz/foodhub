@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/Google/google_sign_in_exception.dart';
+import 'package:foodhub/icons/custom_facebook_icon.dart';
+import 'package:foodhub/icons/custom_google_icon.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
@@ -27,6 +29,10 @@ class WelcomeView extends StatelessWidget {
             await showErrorDialog(context, 'Try signing in again');
           } else if (state.exception is SignInCancelledException) {
             await showErrorDialog(context, 'Signing in Cancelled');
+          } else if (state.exception is NetworkErrorException) {
+            await showErrorDialog(context, 'Try signing in again');
+          } else if (state.exception is SignInFailedException) {
+            await showErrorDialog(context, 'Try signing in again');
           }
         }
       },
@@ -72,7 +78,11 @@ class WelcomeView extends StatelessWidget {
                           )
                         ]),
                     child: TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        context.read<FoodHubBloc>().add(
+                              const AuthEventShouldSignIn(),
+                            );
+                      },
                       child: const Text(
                         'Skip',
                         style:
@@ -188,10 +198,7 @@ class WelcomeView extends StatelessWidget {
                 children: <Widget>[
                   TextButton.icon(
                     onPressed: () {},
-                    icon: Icon(
-                      Icons.face,
-                      size: screenWidth * 0.09,
-                    ),
+                    icon: const CustomFacebookIcon(),
                     label: Text(
                       'FACEBOOK',
                       style: TextStyle(
@@ -210,10 +217,7 @@ class WelcomeView extends StatelessWidget {
                             const AuthEventGoogleSignIn(),
                           );
                     },
-                    icon: Icon(
-                      Icons.face,
-                      size: screenWidth * 0.09,
-                    ),
+                    icon: const CustomGoogleIcon(),
                     label: Text(
                       ' GOOGLE ',
                       style: TextStyle(

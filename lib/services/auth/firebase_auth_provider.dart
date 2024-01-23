@@ -10,7 +10,7 @@ import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/views/verification/verification_exception.dart';
 import 'package:intl_phone_number_input/intl_phone_number_input.dart';
 
-class FirebaseAuthProvider implements AuthProvider {
+class FirebaseAuthProvider implements AuthenticationProvider {
   static final FirebaseAuthProvider _shared =
       FirebaseAuthProvider._sharedInstance();
   FirebaseAuthProvider._sharedInstance();
@@ -56,6 +56,7 @@ class FirebaseAuthProvider implements AuthProvider {
   @override
   User? get currentUser {
     final user = FirebaseAuth.instance.currentUser;
+    user?.reload();
     if (user != null) {
       return user;
     } else {
@@ -126,10 +127,10 @@ class FirebaseAuthProvider implements AuthProvider {
   }
 
   @override
-  Future<void> updateIsEmailVerified() async {
+  Future<void> sendEmailVerification() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
-      await user!.updateEmail(user.email!);
+      await user!.sendEmailVerification();
     } catch (e) {
       throw UpdateIsEmailVerifiedException();
     }
@@ -157,6 +158,8 @@ class FirebaseAuthProvider implements AuthProvider {
             default:
               throw GenericAuthException();
           }
+        } catch (_) {
+          throw GenericAuthException();
         }
         // ignore: use_build_context_synchronously
         context.read<FoodHubBloc>().add(
@@ -209,6 +212,8 @@ class FirebaseAuthProvider implements AuthProvider {
       } else {
         throw GenericAuthException();
       }
+    } catch (_) {
+      throw GenericAuthException();
     }
   }
 }

@@ -10,6 +10,7 @@ class CartListItem extends StatefulWidget {
   final OnAddOrSubToQuatity onAdd;
   final OnAddOrSubToQuatity onSub;
   final OnDeleteItem onDelete;
+
   const CartListItem({
     super.key,
     required this.items,

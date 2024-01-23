@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
+import 'package:foodhub/utilities/dialogs/remove_item_dialog.dart';
 import 'package:foodhub/views/foodhub/cart_list_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 import 'package:rxdart/rxdart.dart';
@@ -24,6 +25,7 @@ class _CartViewState extends State<CartView>
   late final StreamController<double> _deliveryController;
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
+  late final StreamController<String> _restaurantNameController;
   int quantity = 0;
 
   @override
@@ -50,6 +52,7 @@ class _CartViewState extends State<CartView>
       parent: _controller,
       curve: Curves.easeInOut,
     ));
+    _restaurantNameController = StreamController<String>.broadcast();
 
     Future.delayed(const Duration(seconds: 1), () {
       _controller.forward();
@@ -70,6 +73,14 @@ class _CartViewState extends State<CartView>
     );
   }
 
+  String _reload(List<Map<String, dynamic>> items) {
+    if (items.every((item) => item['name'] == items.first['name'])) {
+      return items.first['name'];
+    } else {
+      return '';
+    }
+  }
+
   @override
   void dispose() {
     _controller.dispose();
@@ -87,7 +98,7 @@ class _CartViewState extends State<CartView>
 
     final arguments =
         ModalRoute.of(context)!.settings.arguments as List<dynamic>;
-    final restaurant = arguments[0] as Restaurant;
+    final restaurant = arguments[0] as Restaurant?;
 
     return Stack(
       children: [
@@ -147,7 +158,7 @@ class _CartViewState extends State<CartView>
                 StreamBuilder(
                   stream: _cloudServices.getRestaurantCartItems(
                     ownerUserId: _authProvider.currentUser!.uid,
-                    restaurantName: restaurant.name,
+                    restaurantName: restaurant?.name ?? '',
                   ),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
@@ -156,6 +167,8 @@ class _CartViewState extends State<CartView>
                         if (snapshot.hasData) {
                           final items =
                               snapshot.data as List<Map<String, dynamic>>;
+                          final restaurantName = _reload(items);
+                          _restaurantNameController.add(restaurantName);
                           _listOfItemsController.add(items);
                           return CartListItem(
                             items: items,
@@ -165,14 +178,54 @@ class _CartViewState extends State<CartView>
                               );
                             },
                             onSub: (item) async {
-                              await _cloudServices.subFromItemQuantityInCart(
-                                item: item,
-                              );
+                              final quatity =
+                                  int.parse(item['item']['quatity'].toString());
+                              if (quatity == 1 && items.length == 1) {
+                                final shouldRemove =
+                                    await showRemoveItemDialog(context);
+                                if (shouldRemove) {
+                                  await _cloudServices
+                                      .subFromItemQuantityInCart(
+                                    item: item,
+                                  );
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).pop();
+                                }
+                              } else if (quatity == 1) {
+                                final shouldRemove =
+                                    await showRemoveItemDialog(context);
+                                if (shouldRemove) {
+                                  await _cloudServices
+                                      .subFromItemQuantityInCart(
+                                    item: item,
+                                  );
+                                }
+                              } else {
+                                await _cloudServices.subFromItemQuantityInCart(
+                                  item: item,
+                                );
+                              }
                             },
                             onDelete: (item) async {
-                              await _cloudServices.deleteItemFromCart(
-                                item: item,
-                              );
+                              if (items.length == 1) {
+                                final shouldRemove =
+                                    await showRemoveItemDialog(context);
+                                if (shouldRemove) {
+                                  await _cloudServices.deleteItemFromCart(
+                                    item: item,
+                                  );
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.of(context).pop();
+                                }
+                              } else {
+                                final shouldRemove =
+                                    await showRemoveItemDialog(context);
+                                if (shouldRemove) {
+                                  await _cloudServices.deleteItemFromCart(
+                                    item: item,
+                                  );
+                                }
+                              }
                             },
                           );
                         } else {
@@ -236,7 +289,7 @@ class _CartViewState extends State<CartView>
                           decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               color: const Color(0xFFFE724C)),
-                          padding: EdgeInsets.only(
+                          padding: const EdgeInsets.only(
                             left: 20,
                             right: 20,
                             top: 10,
@@ -360,8 +413,9 @@ class _CartViewState extends State<CartView>
                     Row(
                       children: [
                         StreamBuilder(
-                          stream: _cloudServices.getRestaurantFee(
-                            restaurantName: restaurant.name,
+                          stream: _cloudServices.getRestaurantFeeForCart(
+                            restaurantNameStream:
+                                _restaurantNameController.stream,
                             userId: _authProvider.currentUser!.uid,
                           ),
                           builder: (context, snapshot) {
@@ -370,16 +424,20 @@ class _CartViewState extends State<CartView>
                               case (ConnectionState.active):
                                 if (snapshot.hasData) {
                                   final data = snapshot.data as Map;
-                                  final amount =
-                                      double.parse(data['taxAndFees']);
-                                  _taxFeeController.add(amount);
-                                  return Text(
-                                    '\$${amount.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  );
+                                  if (data.isNotEmpty) {
+                                    final amount =
+                                        double.parse(data['taxAndFees']);
+                                    _taxFeeController.add(amount);
+                                    return Text(
+                                      '\$${amount.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
                                 } else {
                                   return Container();
                                 }
@@ -431,8 +489,9 @@ class _CartViewState extends State<CartView>
                     Row(
                       children: [
                         StreamBuilder(
-                          stream: _cloudServices.getRestaurantFee(
-                            restaurantName: restaurant.name,
+                          stream: _cloudServices.getRestaurantFeeForCart(
+                            restaurantNameStream:
+                                _restaurantNameController.stream,
                             userId: _authProvider.currentUser!.uid,
                           ),
                           builder: (context, snapshot) {
@@ -441,16 +500,20 @@ class _CartViewState extends State<CartView>
                               case (ConnectionState.active):
                                 if (snapshot.hasData) {
                                   final data = snapshot.data as Map;
-                                  final amount =
-                                      double.parse(data['deliveryFee']);
-                                  _deliveryController.add(amount);
-                                  return Text(
-                                    '\$${amount.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  );
+                                  if (data.isNotEmpty) {
+                                    final amount =
+                                        double.parse(data['deliveryFee']);
+                                    _deliveryController.add(amount);
+                                    return Text(
+                                      '\$${amount.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    );
+                                  } else {
+                                    return Container();
+                                  }
                                 } else {
                                   return Container();
                                 }

@@ -10,6 +10,6 @@ class TrackingView extends StatefulWidget {
 class _TrackingViewState extends State<TrackingView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold();
   }
 }

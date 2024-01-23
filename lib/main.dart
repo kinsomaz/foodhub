@@ -11,6 +11,7 @@ import 'package:foodhub/views/foodhub/add_new_address_view.dart';
 import 'package:foodhub/views/foodhub/address_search_body.dart';
 import 'package:foodhub/views/foodhub/home_screen_view.dart';
 import 'package:foodhub/views/foodhub/profile_view.dart';
+import 'package:foodhub/views/foodhub/splash_screen.dart';
 import 'package:foodhub/views/login_view.dart';
 import 'package:foodhub/views/phone_registration_view.dart';
 import 'package:foodhub/views/reset_password_view.dart';
@@ -42,6 +43,7 @@ void main() {
         addressSearchRoute: (context) => const AddressSearchScreen(),
         homeRoute: (context) => const HomeScreenView(),
       },
+      debugShowCheckedModeBanner: false,
     ),
   );
 }
@@ -81,9 +83,7 @@ class HomePage extends StatelessWidget {
         } else if (state is AuthStateSigningIn) {
           return const LoginView();
         } else {
-          return const Scaffold(
-            body: CircularProgressIndicator(),
-          );
+          return const SplashScreen();
         }
       },
     );

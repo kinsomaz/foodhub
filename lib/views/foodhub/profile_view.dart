@@ -123,281 +123,273 @@ class _ProfileViewState extends State<ProfileView> {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
 
-    return StreamBuilder(
-      stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
-      builder: (drawercontext, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-          case ConnectionState.active:
-            _setUpTextControllerListener();
-            if (snapshot.hasData) {
-              final profiles = snapshot.data as List<CloudProfile>;
-              final userProfile = profiles[0];
-              _defaultTextControllerValues(
-                name: userProfile.userName,
-                email: userProfile.userEmail,
-                phone: userProfile.phoneNumber,
-              );
-              return Scaffold(
-                body: SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(
-                          top: screenHeight * 0.06,
-                          left: screenWidth * 0.05,
-                        ),
-                        child: Container(
-                          height: screenHeight * 0.041,
-                          width: screenWidth * 0.08,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5.0),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 3,
-                                  blurRadius: 7,
-                                  offset: const Offset(0, 3),
-                                )
-                              ]),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            padding: EdgeInsets.only(
-                              left: screenWidth * 0.015,
-                            ),
-                            icon: Icon(
-                              Icons.arrow_back_ios,
-                              size: screenWidth * 0.05,
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: StreamBuilder<Object>(
+            stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
+            builder: (context, snapshot) {
+              switch (snapshot.connectionState) {
+                case ConnectionState.waiting:
+                case ConnectionState.active:
+                  _setUpTextControllerListener();
+                  if (snapshot.hasData) {
+                    final profiles = snapshot.data as List<CloudProfile>;
+                    final userProfile = profiles[0];
+                    _defaultTextControllerValues(
+                      name: userProfile.userName,
+                      email: userProfile.userEmail,
+                      phone: userProfile.phoneNumber,
+                    );
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(
+                            top: screenHeight * 0.06,
+                            left: screenWidth * 0.05,
+                          ),
+                          child: Container(
+                            height: screenHeight * 0.041,
+                            width: screenWidth * 0.08,
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(5.0),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.5),
+                                    spreadRadius: 3,
+                                    blurRadius: 7,
+                                    offset: const Offset(0, 3),
+                                  )
+                                ]),
+                            child: IconButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              padding: EdgeInsets.only(
+                                left: screenWidth * 0.015,
+                              ),
+                              icon: Icon(
+                                Icons.arrow_back_ios,
+                                size: screenWidth * 0.05,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      SizedBox(height: screenHeight * 0.05),
-                      GestureDetector(
-                        onTap: () async {
-                          await _pickImage();
-                        },
-                        child: Center(
-                          child: Stack(
-                            children: <Widget>[
-                              ProfileImage(
-                                imageUrl: userProfile.profileImageUrl,
-                                radius: screenWidth * 0.125,
-                              ),
-                              Positioned(
-                                bottom: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: const EdgeInsets.all(5),
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                  ),
-                                  child: Icon(
-                                    Icons.camera_alt,
-                                    size: screenWidth * 0.05,
-                                    color: const Color(0xFFB3B3B3),
+                        SizedBox(height: screenHeight * 0.05),
+                        GestureDetector(
+                          onTap: () async {
+                            await _pickImage();
+                          },
+                          child: Center(
+                            child: Stack(
+                              children: <Widget>[
+                                ProfileImage(
+                                  imageUrl: userProfile.profileImageUrl,
+                                  radius: screenWidth * 0.125,
+                                ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(5),
+                                    decoration: const BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: Colors.white,
+                                    ),
+                                    child: Icon(
+                                      Icons.camera_alt,
+                                      size: screenWidth * 0.05,
+                                      color: const Color(0xFFB3B3B3),
+                                    ),
                                   ),
                                 ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.015),
+                        Center(
+                          child: Text(
+                            userProfile.userName,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.06,
+                              fontFamily: 'SofiaPro',
+                              fontWeight: FontWeight.w600,
+                              color: const Color(0xFF000000),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.001),
+                        Center(
+                          child: Text(
+                            'Edit Profile',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.035,
+                              fontFamily: 'SofiaPro',
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF9796A1),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.05),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
+                          ),
+                          child: SizedBox(
+                            width: screenWidth * 0.25,
+                            height: screenHeight * 0.03,
+                            child: Text(
+                              'Full name',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                                fontFamily: 'SofiaPro',
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9796A1),
                               ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.015),
-                      Center(
-                        child: Text(
-                          userProfile.userName,
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.06,
-                            fontFamily: 'SofiaPro',
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF000000),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.001),
-                      Center(
-                        child: Text(
-                          'Edit Profile',
-                          style: TextStyle(
-                            fontSize: screenWidth * 0.035,
-                            fontFamily: 'SofiaPro',
-                            fontWeight: FontWeight.w400,
-                            color: const Color(0xFF9796A1),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.05),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                        ),
-                        child: SizedBox(
-                          width: screenWidth * 0.25,
-                          height: screenHeight * 0.03,
-                          child: Text(
-                            'Full name',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF9796A1),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                          right: screenWidth * 0.05,
-                          top: screenHeight * 0.01,
-                        ),
-                        child: Container(
-                          height: screenHeight * 0.07,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            border: Border.all(
-                              color: _focusNodeName.hasFocus
-                                  ? const Color(0xFFFE724C)
-                                  : const Color(0xFFEEEEEE),
-                            ),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
+                            right: screenWidth * 0.05,
+                            top: screenHeight * 0.01,
                           ),
-                          child: TextField(
-                            controller: _name,
-                            focusNode: _focusNodeName,
-                            keyboardType: TextInputType.name,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(10.0),
+                          child: Container(
+                            height: screenHeight * 0.07,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border.all(
+                                color: _focusNodeName.hasFocus
+                                    ? const Color(0xFFFE724C)
+                                    : const Color(0xFFEEEEEE),
+                              ),
                             ),
-                            cursorColor: const Color(0xFFFE724C),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.03),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                        ),
-                        child: SizedBox(
-                          width: screenWidth * 0.25,
-                          height: screenHeight * 0.03,
-                          child: Text(
-                            'E-mail',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF9796A1),
+                            child: TextField(
+                              controller: _name,
+                              focusNode: _focusNodeName,
+                              keyboardType: TextInputType.name,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.all(10.0),
+                              ),
+                              cursorColor: const Color(0xFFFE724C),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                          right: screenWidth * 0.05,
-                          top: screenHeight * 0.01,
-                        ),
-                        child: Container(
-                          height: screenHeight * 0.07,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            border: Border.all(
-                              color: _focusNodeEmail.hasFocus
-                                  ? const Color(0xFFFE724C)
-                                  : const Color(0xFFEEEEEE),
-                            ),
+                        SizedBox(height: screenHeight * 0.03),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
                           ),
-                          child: TextField(
-                            controller: _email,
-                            focusNode: _focusNodeEmail,
-                            keyboardType: TextInputType.emailAddress,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(10.0),
-                            ),
-                            cursorColor: const Color(0xFFFE724C),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.03),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                        ),
-                        child: SizedBox(
-                          width: screenWidth * 0.6,
-                          height: screenHeight * 0.03,
-                          child: Text(
-                            'Phone Number',
-                            style: TextStyle(
-                              fontSize: screenWidth * 0.04,
-                              fontFamily: 'SofiaPro',
-                              fontWeight: FontWeight.w400,
-                              color: const Color(0xFF9796A1),
+                          child: SizedBox(
+                            width: screenWidth * 0.25,
+                            height: screenHeight * 0.03,
+                            child: Text(
+                              'E-mail',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                                fontFamily: 'SofiaPro',
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9796A1),
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(
-                          left: screenWidth * 0.05,
-                          right: screenWidth * 0.05,
-                          top: screenHeight * 0.01,
-                        ),
-                        child: Container(
-                          height: screenHeight * 0.07,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            border: Border.all(
-                              color: _focusNodePhone.hasFocus
-                                  ? const Color(0xFFFE724C)
-                                  : const Color(0xFFEEEEEE),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
+                            right: screenWidth * 0.05,
+                            top: screenHeight * 0.01,
+                          ),
+                          child: Container(
+                            height: screenHeight * 0.07,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border.all(
+                                color: _focusNodeEmail.hasFocus
+                                    ? const Color(0xFFFE724C)
+                                    : const Color(0xFFEEEEEE),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: _email,
+                              focusNode: _focusNodeEmail,
+                              keyboardType: TextInputType.emailAddress,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.all(10.0),
+                              ),
+                              cursorColor: const Color(0xFFFE724C),
                             ),
                           ),
-                          child: TextField(
-                            controller: _phoneNumber,
-                            focusNode: _focusNodePhone,
-                            keyboardType: TextInputType.phone,
-                            enableSuggestions: false,
-                            autocorrect: false,
-                            decoration: const InputDecoration(
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(10.0),
+                        ),
+                        SizedBox(height: screenHeight * 0.03),
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
+                          ),
+                          child: SizedBox(
+                            width: screenWidth * 0.6,
+                            height: screenHeight * 0.03,
+                            child: Text(
+                              'Phone Number',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.04,
+                                fontFamily: 'SofiaPro',
+                                fontWeight: FontWeight.w400,
+                                color: const Color(0xFF9796A1),
+                              ),
                             ),
-                            cursorColor: const Color(0xFFFE724C),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            } else {
-              return const CircularProgressIndicator();
-            }
-          default:
-            return Center(
-              child: Container(
-                  constraints: const BoxConstraints(
-                    maxHeight: 10,
-                    maxWidth: 10,
-                  ),
-                  child: const CircularProgressIndicator()),
-            );
-        }
-      },
+                        Padding(
+                          padding: EdgeInsets.only(
+                            left: screenWidth * 0.05,
+                            right: screenWidth * 0.05,
+                            top: screenHeight * 0.01,
+                          ),
+                          child: Container(
+                            height: screenHeight * 0.07,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              border: Border.all(
+                                color: _focusNodePhone.hasFocus
+                                    ? const Color(0xFFFE724C)
+                                    : const Color(0xFFEEEEEE),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: _phoneNumber,
+                              focusNode: _focusNodePhone,
+                              keyboardType: TextInputType.phone,
+                              enableSuggestions: false,
+                              autocorrect: false,
+                              decoration: const InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.all(10.0),
+                              ),
+                              cursorColor: const Color(0xFFFE724C),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  } else {
+                    return Container();
+                  }
+                default:
+                  return Container();
+              }
+            }),
+      ),
     );
   }
 }

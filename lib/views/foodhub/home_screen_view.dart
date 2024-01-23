@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -49,10 +50,10 @@ class _HomeScreenViewState extends State<HomeScreenView>
   final FocusNode _focusNodeSearch = FocusNode();
   final List<dynamic> route = [
     null,
-    trackingRoute(),
-    cartRoute(arguments: []),
+    () => trackingRoute(),
+    () => cartRoute(arguments: [null]),
     () => favouriteRoute(),
-    ordersRoute(),
+    () => ordersRoute(),
   ];
 
   @override
@@ -104,6 +105,63 @@ class _HomeScreenViewState extends State<HomeScreenView>
         appBar: AppBar(
           title: const Text('Food Hub'),
           centerTitle: true,
+          actions: [
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                child: StreamBuilder(
+                  stream: _cloudServices.userProfile(ownerUserId: _user!.uid),
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                        if (snapshot.hasData) {
+                          final profiles = snapshot.data as List<CloudProfile>;
+                          final userProfile = profiles[0];
+                          if (userProfile.profileImageUrl.isEmpty) {
+                            return Container();
+                          } else {
+                            return CachedNetworkImage(
+                              imageUrl: userProfile.profileImageUrl,
+                              imageBuilder: (context, imageProvider) =>
+                                  Container(
+                                height: 32,
+                                width: 33,
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                  child: Image(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                              placeholder: (context, url) => Container(
+                                height: 32,
+                                width: 33,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha(10),
+                                  borderRadius: const BorderRadius.all(
+                                    Radius.circular(10),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        } else {
+                          return Container();
+                        }
+                      default:
+                        return Container();
+                    }
+                  },
+                )),
+          ],
         ),
         drawer: StreamBuilder(
           stream: _cloudServices.userProfile(ownerUserId: _user!.uid),

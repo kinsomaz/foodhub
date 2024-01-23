@@ -30,6 +30,10 @@ Future<User?> googleSignIn() async {
       throw GoogleSignInAuthenticationException();
     } else if (e.code == 'sign_in_canceled') {
       throw SignInCancelledException();
+    } else if (e.code == 'network_error') {
+      throw NetworkErrorException();
+    } else if (e.code == 'sign_in_failed') {
+      throw SignInFailedException();
     } else {
       throw GoogleErrorException();
     }

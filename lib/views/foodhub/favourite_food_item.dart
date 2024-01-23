@@ -1,7 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/routes/restaurant_profile_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
+import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/views/foodhub/favourite_item_list_view.dart';
 import 'package:foodhub/views/foodhub/favourite_restaurant_list_view.dart';
@@ -80,6 +82,63 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
               fontWeight: FontWeight.w400,
               color: Color(0xFF111719)),
         ),
+        actions: [
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+              child: StreamBuilder(
+                stream: _cloudServices.userProfile(
+                    ownerUserId: _authProvider.currentUser!.uid),
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      if (snapshot.hasData) {
+                        final profiles = snapshot.data as List<CloudProfile>;
+                        final userProfile = profiles[0];
+                        if (userProfile.profileImageUrl.isEmpty) {
+                          return Container();
+                        } else {
+                          return CachedNetworkImage(
+                            imageUrl: userProfile.profileImageUrl,
+                            imageBuilder: (context, imageProvider) => Container(
+                              height: 32,
+                              width: 33,
+                              decoration: const BoxDecoration(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                                child: Image(
+                                  image: imageProvider,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            placeholder: (context, url) => Container(
+                              height: 32,
+                              width: 33,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withAlpha(10),
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(10),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                      } else {
+                        return Container();
+                      }
+                    default:
+                      return Container();
+                  }
+                },
+              )),
+        ],
         centerTitle: true,
       ),
       body: Column(

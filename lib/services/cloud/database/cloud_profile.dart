@@ -26,14 +26,14 @@ class CloudProfile {
 
   CloudProfile.fromSnapshot(
       QueryDocumentSnapshot<Map<String, dynamic>> snapshot)
-      : ownerUserId = snapshot.data()[ownerUserIdFieldName],
-        userName = snapshot.data()[userNameFieldName],
-        userEmail = snapshot.data()[emailFieldName],
-        phoneNumber = snapshot.data()[phoneFieldName],
-        profileImageUrl = snapshot.data()[profileImageUrlFieldName],
-        state = snapshot.data()[stateFieldName],
-        city = snapshot.data()[cityFieldName],
-        street = snapshot.data()[streetFieldName],
+      : ownerUserId = snapshot.data()[ownerUserIdFieldName] ?? '',
+        userName = snapshot.data()[userNameFieldName] ?? '',
+        userEmail = snapshot.data()[emailFieldName] ?? '',
+        phoneNumber = snapshot.data()[phoneFieldName] ?? '',
+        profileImageUrl = snapshot.data()[profileImageUrlFieldName] ?? '',
+        state = snapshot.data()[stateFieldName] ?? '',
+        city = snapshot.data()[cityFieldName] ?? '',
+        street = snapshot.data()[streetFieldName] ?? '',
         favouriteRestaurants =
             (snapshot.data()[favouriteRestaurantsFieldName] as List<dynamic>?)
                     ?.cast<String>() ??

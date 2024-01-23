@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:foodhub/icons/custom_facebook_icon.dart';
+import 'package:foodhub/icons/custom_google_icon.dart';
 import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
@@ -396,10 +398,7 @@ class _LoginViewState extends State<LoginView> {
                         ]),
                     child: TextButton.icon(
                       onPressed: () {},
-                      icon: Icon(
-                        Icons.face,
-                        size: screenWidth * 0.09,
-                      ),
+                      icon: const CustomFacebookIcon(),
                       label: Text(
                         'FACEBOOK',
                         style: TextStyle(
@@ -432,10 +431,7 @@ class _LoginViewState extends State<LoginView> {
                               const AuthEventGoogleSignIn(),
                             );
                       },
-                      icon: Icon(
-                        Icons.face,
-                        size: screenWidth * 0.09,
-                      ),
+                      icon: const CustomGoogleIcon(),
                       label: Text(
                         ' GOOGLE ',
                         style: TextStyle(

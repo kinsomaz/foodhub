@@ -2,17 +2,15 @@ import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 import 'package:foodhub/Google/google_sign_in.dart';
+import 'package:foodhub/services/auth/auth_exception.dart';
 import 'package:foodhub/services/auth/auth_providers.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
-import 'package:foodhub/views/verification/send_verification_email_code.dart';
-import 'package:foodhub/views/verification/email_verification_code_generator.dart';
-import 'package:foodhub/views/verification/verification_exception.dart';
 
 class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
-  final AuthProvider provider;
+  final AuthenticationProvider provider;
   final CloudDatabase database;
   final BuildContext context;
   FoodHubBloc(this.provider, this.database, this.context)
@@ -76,51 +74,54 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
       },
     );
     // send email verification
-    on<AuthEventVerifyEmailCode>(
+    on<AuthEventResendEmailVerification>(
       (event, emit) async {
-        final verificationCode =
-            "${event.codeOne}${event.codeTwo}${event.codeThree}${event.codeFour}";
+        try {
+          //send verificationLink to user email
+          await provider.sendEmailVerification();
+          emit(
+            const AuthStateEmailNeedsVerification(
+              exception: null,
+              isLoading: false,
+            ),
+          );
+        } on Exception catch (e) {
+          AuthStateEmailNeedsVerification(
+            exception: e,
+            isLoading: false,
+          );
+        }
+      },
+    );
+    // go to PhoneView
+    on<AuthEventPhoneView>(
+      (event, emit) async {
         emit(
           const AuthStateEmailNeedsVerification(
-            isLoading: true,
             exception: null,
-            isSuccessful: null,
+            isLoading: true,
           ),
         );
-        try {
-          final user = provider.currentUser;
-          final originalVerificationCode =
-              await database.readVerificationCode(ownerUserId: user!.uid);
-          if (verificationCode == originalVerificationCode) {
-            emit(
-              const AuthStateEmailNeedsVerification(
-                isLoading: false,
-                exception: null,
-                isSuccessful: true,
-              ),
-            );
-            emit(
-              const AuthStatePhoneRegistration(
-                isLoading: false,
-                exception: null,
-              ),
-            );
-          } else {
-            Exception error = InvalidVerifiationCodeException();
-            emit(
-              AuthStateEmailNeedsVerification(
-                isLoading: false,
-                exception: error,
-                isSuccessful: null,
-              ),
-            );
-          }
-        } on Exception catch (e) {
+        final user = provider.currentUser;
+        user!.reload();
+        if (user.emailVerified) {
+          emit(
+            const AuthStateEmailNeedsVerification(
+              exception: null,
+              isLoading: false,
+            ),
+          );
+          emit(
+            const AuthStatePhoneRegistration(
+              exception: null,
+              isLoading: false,
+            ),
+          );
+        } else {
           emit(
             AuthStateEmailNeedsVerification(
+              exception: EmailNotVerifiedAuthException(),
               isLoading: false,
-              exception: e,
-              isSuccessful: null,
             ),
           );
         }
@@ -201,6 +202,12 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
                   });
                 }
                 emit(
+                  const AuthStatePhoneNeedsVerification(
+                    exception: null,
+                    isLoading: false,
+                  ),
+                );
+                emit(
                   AuthStateLoggedIn(
                     user: user,
                     isLoading: false,
@@ -246,16 +253,12 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             state: '',
             city: '',
             street: '',
+            profileUrl: '',
           );
 
-          //send verificationCode to user email and store in cloud
-          final verificationCode = generateRandomCode();
-          await sendVerificationEmailCode(
-              email: email, verificationCode: verificationCode);
-          await database.storeVerificationCode(
-            ownerUserId: user.uid,
-            verificationCode: verificationCode,
-          );
+          //send verificationLink to user email
+          await provider.sendEmailVerification();
+
           emit(
             const AuthStateRegistering(
               exception: null,
@@ -264,9 +267,8 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
           );
           emit(
             const AuthStateEmailNeedsVerification(
-              isLoading: false,
               exception: null,
-              isSuccessful: null,
+              isLoading: false,
             ),
           );
         } on Exception catch (e) {
@@ -304,6 +306,7 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               state: '',
               city: '',
               street: '',
+              profileUrl: '',
             );
           }
 
@@ -355,7 +358,6 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
             const AuthStateEmailNeedsVerification(
               isLoading: false,
               exception: null,
-              isSuccessful: null,
             ),
           );
         } else if (user.phoneNumber == null || user.phoneNumber == "") {
@@ -403,7 +405,6 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
               const AuthStateEmailNeedsVerification(
                 isLoading: false,
                 exception: null,
-                isSuccessful: null,
               ),
             );
           } else if (user.phoneNumber == null || user.phoneNumber == "") {

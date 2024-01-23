@@ -10,6 +10,6 @@ class OrdersView extends StatefulWidget {
 class _OrdersViewState extends State<OrdersView> {
   @override
   Widget build(BuildContext context) {
-    return const Placeholder();
+    return const Scaffold();
   }
 }

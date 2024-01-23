@@ -17,12 +17,9 @@ abstract class CloudDatabase {
     required String state,
     required String city,
     required String street,
+    required String profileUrl,
   });
   FirebaseFirestore initialize();
-  Future<void> storeVerificationCode({
-    required String ownerUserId,
-    required String verificationCode,
-  });
   Future<String> readVerificationCode({
     required String ownerUserId,
   });
@@ -113,6 +110,10 @@ abstract class CloudDatabase {
   });
   Future<void> setRestaurantFee({
     required String restaurantName,
+    required String userId,
+  });
+  Stream<Map> getRestaurantFeeForCart({
+    required Stream<String> restaurantNameStream,
     required String userId,
   });
   Stream<Map> getRestaurantFee({

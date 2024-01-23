@@ -61,11 +61,11 @@ class AuthStateLoggedIn extends FoodHubState {
 
 class AuthStateEmailNeedsVerification extends FoodHubState {
   final Exception? exception;
-  final bool? isSuccessful;
-  const AuthStateEmailNeedsVerification(
-      {required this.exception,
-      required super.isLoading,
-      required this.isSuccessful});
+
+  const AuthStateEmailNeedsVerification({
+    required this.exception,
+    required super.isLoading,
+  });
 }
 
 class AuthStatePhoneNeedsVerification extends FoodHubState {

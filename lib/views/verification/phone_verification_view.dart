@@ -59,6 +59,8 @@ class _PhoneVerificationViewState extends State<PhoneVerificationView> {
               showErrorDialog(context, 'Too many attempt');
             } else if (state.exception is GenericAuthException) {
               showErrorDialog(context, 'Check your internet connection');
+            } else {
+              showErrorDialog(context, 'Verfication failed');
             }
           }
         },

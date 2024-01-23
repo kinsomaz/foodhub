@@ -26,6 +26,7 @@ class FirebaseCloudDatabase implements CloudDatabase {
     required String state,
     required String city,
     required String street,
+    required String profileUrl,
   }) async {
     final profile = initialize().collection('profile');
     await profile.add({
@@ -36,23 +37,12 @@ class FirebaseCloudDatabase implements CloudDatabase {
       stateFieldName: state,
       cityFieldName: city,
       streetFieldName: street,
+      profileImageUrlFieldName: profileUrl,
     });
   }
 
   @override
   FirebaseFirestore initialize() => FirebaseFirestore.instance;
-
-  @override
-  Future<void> storeVerificationCode({
-    required String ownerUserId,
-    required String verificationCode,
-  }) async {
-    final verification = initialize().collection('verificationCode');
-    await verification.add({
-      ownerUserIdFieldName: ownerUserId,
-      verificationCodeFieldName: verificationCode,
-    });
-  }
 
   @override
   Future<String> readVerificationCode({
@@ -107,8 +97,8 @@ class FirebaseCloudDatabase implements CloudDatabase {
   @override
   Stream<List<Restaurant>?> featuredRestaurantsStream({
     required Stream<String?> foodCategoryNameStream,
-  }) async* {
-    await for (var foodCategoryName in foodCategoryNameStream) {
+  }) {
+    return foodCategoryNameStream.asyncMap((foodCategoryName) async {
       try {
         if (foodCategoryName == 'all') {
           final restaurantCollection =
@@ -116,7 +106,7 @@ class FirebaseCloudDatabase implements CloudDatabase {
           final restaurants = restaurantCollection.docs
               .map((doc) => Restaurant.fromSnapshot(doc))
               .toList();
-          yield restaurants;
+          return restaurants;
         } else {
           final foodCategory = initialize().collection('foodCategory');
           final foodCategoryDocsList = await foodCategory
@@ -129,12 +119,12 @@ class FirebaseCloudDatabase implements CloudDatabase {
           final restaurants = restaurantQuery.docs
               .map((doc) => Restaurant.fromSnapshot(doc))
               .toList();
-          yield restaurants;
+          return restaurants;
         }
       } catch (e) {
         throw ErrorFetchingFeaturedRestaurant();
       }
-    }
+    });
   }
 
   @override
@@ -557,18 +547,35 @@ class FirebaseCloudDatabase implements CloudDatabase {
     required String restaurantName,
   }) {
     final userCart = initialize().collection('userCart');
-    final userCartCollection = userCart
-        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
-        .where('name', isEqualTo: restaurantName)
-        .snapshots();
+    if (restaurantName.isNotEmpty) {
+      final userCartCollection = userCart
+          .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+          .where('name', isEqualTo: restaurantName)
+          .snapshots();
+      return userCartCollection.map(
+        (event) {
+          if (event.docs.isNotEmpty) {
+            return event.docs.map((doc) => doc.data()).toList();
+          } else {
+            return null;
+          }
+        },
+      );
+    } else {
+      final userCartCollection = userCart
+          .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+          .snapshots();
 
-    return userCartCollection.map((event) {
-      if (event.docs.isNotEmpty) {
-        return event.docs.map((doc) => doc.data()).toList();
-      } else {
-        return null;
-      }
-    });
+      return userCartCollection.map(
+        (event) {
+          if (event.docs.isNotEmpty) {
+            return event.docs.map((doc) => doc.data()).toList();
+          } else {
+            return null;
+          }
+        },
+      );
+    }
   }
 
   @override
@@ -630,10 +637,28 @@ class FirebaseCloudDatabase implements CloudDatabase {
   }
 
   @override
-  Stream<Map> getRestaurantFee({
-    required String restaurantName,
+  Stream<Map> getRestaurantFeeForCart({
+    required Stream<String> restaurantNameStream,
     required String userId,
   }) {
+    return restaurantNameStream.asyncMap((restaurantName) async {
+      final calculatedRestaurantFeeCollection =
+          initialize().collection('calculatedRestaurantFee');
+      final doc = await calculatedRestaurantFeeCollection.doc(userId).get();
+      final restaurantData = doc.data();
+      if (restaurantName.isNotEmpty) {
+        final restaurantFee = restaurantData![restaurantName] as Map;
+        return restaurantFee;
+      } else {
+        final restaurantFee = {};
+        return restaurantFee;
+      }
+    });
+  }
+
+  @override
+  Stream<Map> getRestaurantFee(
+      {required String restaurantName, required String userId}) {
     final calculatedRestaurantFeeCollection =
         initialize().collection('calculatedRestaurantFee');
     return calculatedRestaurantFeeCollection

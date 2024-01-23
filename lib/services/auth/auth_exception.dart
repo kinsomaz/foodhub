@@ -27,3 +27,6 @@ class CredentialAlreadyInUseAuthException implements Exception {}
 class InvalidPhoneNumberAuthException implements Exception {}
 
 class SMSQuotaExceededAuthException implements Exception {}
+
+// Email exception
+class EmailNotVerifiedAuthException implements Exception {}
