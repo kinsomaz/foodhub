@@ -19,7 +19,7 @@ class SplashScreen extends StatelessWidget {
                 const Text(
                   'FOOD',
                   style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 42,
                       fontFamily: 'Phosphate',
                       fontWeight: FontWeight.w400,
                       color: Color(0xFFFFFFFF)),
@@ -30,7 +30,7 @@ class SplashScreen extends StatelessWidget {
                 Text(
                   'HUB',
                   style: TextStyle(
-                      fontSize: 40,
+                      fontSize: 42,
                       fontFamily: 'Phosphate',
                       fontWeight: FontWeight.w400,
                       color: const Color(0xFFFFFFFF).withOpacity(0.6)),

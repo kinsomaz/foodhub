@@ -54,5 +54,4 @@ flutter:
       - asset: fonts/HelveticaNeue/Helvetica Neu Bold.ttf   
   - family: Phosphate
     fonts:
-      - asset: fonts/Phosphate_Pro/Phosphate Pro Cond Solid Regular.otf
       - asset: fonts/Phosphate_Pro/Phosphate Pro Cond Inline Regular.otf

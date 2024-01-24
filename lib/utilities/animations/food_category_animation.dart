@@ -22,6 +22,7 @@ class FoodCategoryAnimation extends StatelessWidget {
               border: Border.all(
                 color: const Color(0xFFEEEEEE),
               ),
+              color: const Color(0xFFFFFFFF),
               boxShadow: [
                 BoxShadow(
                   color: Colors.black.withOpacity(0.1),
