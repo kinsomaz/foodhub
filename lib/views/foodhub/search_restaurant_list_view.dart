@@ -128,34 +128,37 @@ class _SearchRestaurantListViewState extends State<SearchRestaurantListView> {
                         SizedBox(
                           height: screenHeight * 0.035,
                         ),
-                        Row(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                left: screenWidth * 0.02,
-                                right: screenWidth * 0.015,
-                              ),
-                              child: Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  restaurant.name,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w600,
-                                    fontFamily: 'SofiaPro',
-                                    color: Color(0xFF000000),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(
+                                  left: screenWidth * 0.02,
+                                  right: screenWidth * 0.015,
+                                ),
+                                child: Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    restaurant.name,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'SofiaPro',
+                                      color: Color(0xFF000000),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            Icon(
-                              Icons.check_circle,
-                              color: restaurant.isVerified
-                                  ? const Color(0xFF029094)
-                                  : const Color(0xFFD3D1D8),
-                              size: 13,
-                            ),
-                          ],
+                              Icon(
+                                Icons.check_circle,
+                                color: restaurant.isVerified
+                                    ? const Color(0xFF029094)
+                                    : const Color(0xFFD3D1D8),
+                                size: 13,
+                              ),
+                            ],
+                          ),
                         ),
                         SizedBox(
                           height: screenHeight * 0.001,
@@ -164,104 +167,111 @@ class _SearchRestaurantListViewState extends State<SearchRestaurantListView> {
                           width: screenWidth * 0.4,
                           constraints:
                               BoxConstraints(maxWidth: screenWidth * 0.4),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.only(
-                                  left: screenWidth * 0.02,
-                                  right: 4,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    left: screenWidth * 0.02,
+                                    right: 4,
+                                  ),
+                                  child: const CustomDeliveryIcon(),
                                 ),
-                                child: const CustomDeliveryIcon(),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.only(
-                                  right: 2,
-                                ),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: StreamBuilder(
-                                    stream: widget
-                                        .getRestaurantFee(restaurant.name),
-                                    builder: (context, snapshot) {
-                                      switch (snapshot.connectionState) {
-                                        case (ConnectionState.waiting):
-                                        case (ConnectionState.active):
-                                          if (snapshot.hasData) {
-                                            final data = snapshot.data;
-                                            final amount = double.parse(
-                                                data!['deliveryFee']);
-                                            return Text(
-                                              '\$${amount.toStringAsFixed(2)}',
-                                              style: const TextStyle(
-                                                fontSize: 11,
-                                                fontWeight: FontWeight.w400,
-                                                fontFamily: 'HelveticaNeue',
-                                                color: Color(0xFF7E8392),
-                                              ),
-                                            );
-                                          } else {
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    right: 2,
+                                  ),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: StreamBuilder(
+                                      stream: widget
+                                          .getRestaurantFee(restaurant.name),
+                                      builder: (context, snapshot) {
+                                        switch (snapshot.connectionState) {
+                                          case (ConnectionState.waiting):
+                                          case (ConnectionState.active):
+                                            if (snapshot.hasData) {
+                                              final data = snapshot.data;
+                                              final amount = double.parse(
+                                                  data!['deliveryFee']);
+                                              return Text(
+                                                '\$${amount.toStringAsFixed(2)}',
+                                                style: TextStyle(
+                                                  fontSize: screenWidth * 0.030,
+                                                  fontWeight: FontWeight.w400,
+                                                  fontFamily: 'HelveticaNeue',
+                                                  color:
+                                                      const Color(0xFF7E8392),
+                                                ),
+                                              );
+                                            } else {
+                                              return Container();
+                                            }
+                                          default:
                                             return Container();
-                                          }
-                                        default:
-                                          return Container();
-                                      }
-                                    },
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                              const Padding(
-                                padding: EdgeInsets.only(
-                                  left: 4,
-                                  right: 2,
+                                const Padding(
+                                  padding: EdgeInsets.only(
+                                    left: 4,
+                                    right: 2,
+                                  ),
+                                  child: CustomDeliveryClockIcon(),
                                 ),
-                                child: CustomDeliveryClockIcon(),
-                              ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Text(
-                                  restaurant.deliveryTime,
-                                  style: const TextStyle(
-                                    fontSize: 11,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: 'HelveticaNeue',
-                                    color: Color(0xFF7E8392),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Text(
+                                    restaurant.deliveryTime,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.030,
+                                      fontWeight: FontWeight.w400,
+                                      fontFamily: 'HelveticaNeue',
+                                      color: const Color(0xFF7E8392),
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         SizedBox(
                           height: screenHeight * 0.008,
                         ),
-                        Wrap(
-                          children: restaurant.tags
-                              .map((tag) {
-                                return Container(
-                                  margin: EdgeInsets.only(
-                                    left: screenWidth * 0.02,
-                                  ),
-                                  padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth * 0.015,
-                                    vertical: 2.0,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF6F6F6),
-                                    borderRadius: BorderRadius.circular(5),
-                                  ),
-                                  child: Text(
-                                    tag,
-                                    style: const TextStyle(
-                                      fontSize: 10,
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: 'SofiaPro',
-                                      color: Color(0xFF8A8E9B),
+                        SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Wrap(
+                            children: restaurant.tags
+                                .map((tag) {
+                                  return Container(
+                                    margin: EdgeInsets.only(
+                                      left: screenWidth * 0.02,
                                     ),
-                                  ),
-                                );
-                              })
-                              .take(2)
-                              .toList(),
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.015,
+                                      vertical: 2.0,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFF6F6F6),
+                                      borderRadius: BorderRadius.circular(5),
+                                    ),
+                                    child: Text(
+                                      tag,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.028,
+                                        fontWeight: FontWeight.w400,
+                                        fontFamily: 'SofiaPro',
+                                        color: const Color(0xFF8A8E9B),
+                                      ),
+                                    ),
+                                  );
+                                })
+                                .take(2)
+                                .toList(),
+                          ),
                         ),
                       ],
                     ),

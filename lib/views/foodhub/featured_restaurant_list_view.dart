@@ -240,11 +240,11 @@ class _FeaturedRestaurantListViewState
                           alignment: Alignment.centerLeft,
                           child: Text(
                             restaurant.name,
-                            style: const TextStyle(
-                              fontSize: 15,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.043,
                               fontWeight: FontWeight.w600,
                               fontFamily: 'SofiaPro',
-                              color: Color(0xFF000000),
+                              color: const Color(0xFF000000),
                             ),
                           ),
                         ),
@@ -292,11 +292,11 @@ class _FeaturedRestaurantListViewState
                                             double.parse(data!['deliveryFee']);
                                         return Text(
                                           '\$${amount.toStringAsFixed(2)}',
-                                          style: const TextStyle(
-                                            fontSize: 13,
+                                          style: TextStyle(
+                                            fontSize: screenWidth * 0.034,
                                             fontWeight: FontWeight.w400,
                                             fontFamily: 'HelveticaNeue',
-                                            color: Color(0xFF7E8392),
+                                            color: const Color(0xFF7E8392),
                                           ),
                                         );
                                       } else {
@@ -329,11 +329,11 @@ class _FeaturedRestaurantListViewState
                           alignment: Alignment.centerLeft,
                           child: Text(
                             restaurant.deliveryTime,
-                            style: const TextStyle(
-                              fontSize: 13,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.034,
                               fontWeight: FontWeight.w400,
                               fontFamily: 'HelveticaNeue',
-                              color: Color(0xFF7E8392),
+                              color: const Color(0xFF7E8392),
                             ),
                           ),
                         ),
@@ -344,7 +344,7 @@ class _FeaturedRestaurantListViewState
                     height: screenHeight * 0.007,
                   ),
                   Container(
-                    height: 22,
+                    height: screenWidth * 0.06,
                     margin: EdgeInsets.only(
                       left: screenWidth * 0.01,
                     ),

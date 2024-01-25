@@ -44,7 +44,6 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final FirebaseCloudDatabase _cloudServices;
   late final FirebaseAuthProvider _authProvider;
   late final User? _user;
-  late AnimationController _waterFlowController;
   late final StreamController<String> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
@@ -67,15 +66,10 @@ class _HomeScreenViewState extends State<HomeScreenView>
         _foodCategoryNameController.sink.add('all');
       },
     );
-
     super.initState();
     _focusNodeSearch.addListener(() {
       setState(() {});
     });
-    _waterFlowController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
 
     super.initState();
   }
@@ -89,7 +83,6 @@ class _HomeScreenViewState extends State<HomeScreenView>
     _searchController.dispose();
     _focusNodeSearch.dispose();
     _foodCategoryNameController.close();
-    _waterFlowController.dispose();
     super.dispose();
   }
 
@@ -428,12 +421,12 @@ class _HomeScreenViewState extends State<HomeScreenView>
                         enableSuggestions: false,
                         autocorrect: false,
                         textAlignVertical: TextAlignVertical.center,
-                        decoration: const InputDecoration(
+                        decoration: InputDecoration(
                           hintText: 'Find for food or restaurant',
                           hintStyle: TextStyle(
-                            fontSize: 15,
+                            fontSize: screenWidth * 0.042,
                             fontWeight: FontWeight.w400,
-                            color: Color(0xFF9AA0B4),
+                            color: const Color(0xFF9AA0B4),
                           ),
                           prefixIcon: Icon(Icons.search),
                           border: InputBorder.none,
@@ -485,7 +478,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                         final foodCategories =
                             snapshot.data as List<FoodCategory>;
                         return Container(
-                          height: 100,
+                          height: screenHeight * 0.14,
                           margin: EdgeInsets.only(
                             left: screenWidth * 0.025,
                             right: screenWidth * 0.025,
@@ -503,11 +496,15 @@ class _HomeScreenViewState extends State<HomeScreenView>
                         );
                       } else {
                         return buildFoodCategoryLoadingState(
-                            screenWidth, _waterFlowController);
+                          screenHeight,
+                          screenWidth,
+                        );
                       }
                     default:
                       return buildFoodCategoryLoadingState(
-                          screenWidth, _waterFlowController);
+                        screenHeight,
+                        screenWidth,
+                      );
                   }
                 },
               ),

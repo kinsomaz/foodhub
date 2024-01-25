@@ -27,6 +27,7 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
 
     return ListView.builder(
       itemCount: widget.foodCategories.length,
@@ -48,8 +49,8 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
           child: Padding(
             padding: EdgeInsets.all(screenWidth * 0.025),
             child: Container(
-              width: 54,
-              height: 100,
+              width: screenWidth * 0.16,
+              height: screenHeight * 0.14,
               decoration: BoxDecoration(
                 color: index == selectedIdx
                     ? const Color(0xFFFE724C)
@@ -68,23 +69,23 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const SizedBox(
-                    height: 5,
+                  SizedBox(
+                    height: screenHeight * 0.008,
                   ),
                   CachedNetworkImage(
                     imageUrl: foodCategory.imageUrl,
                     imageBuilder: (context, imageProvider) => CircleAvatar(
                       backgroundImage: imageProvider,
                       backgroundColor: const Color(0xFFFFFFFF),
-                      radius: 23,
+                      radius: screenWidth * 0.062,
                     ),
                     placeholder: (context, url) => CircleAvatar(
                       backgroundColor: Colors.black.withAlpha(10),
-                      radius: 23,
+                      radius: screenWidth * 0.062,
                     ),
                   ),
-                  const SizedBox(
-                    height: 5,
+                  SizedBox(
+                    height: screenHeight * 0.006,
                   ),
                   Text(
                     foodCategory.name,
@@ -92,7 +93,7 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
                       color: index == selectedIdx
                           ? const Color(0xFFFFFFFF)
                           : const Color(0xFF67666D),
-                      fontSize: 10,
+                      fontSize: screenWidth * 0.027,
                       fontWeight: FontWeight.w500,
                     ),
                   ),

@@ -304,11 +304,11 @@ class _MenuItemDetailsViewState extends State<MenuItemDetailsView>
                       width: screenWidth * 0.8,
                       child: Text(
                         menuItem.name,
-                        style: const TextStyle(
-                          fontSize: 29,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.08,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SofiaPro',
-                          color: Color(0xFF323643),
+                          color: const Color(0xFF323643),
                         ),
                       ),
                     ),
@@ -387,11 +387,11 @@ class _MenuItemDetailsViewState extends State<MenuItemDetailsView>
                   ),
                   child: Text(
                     menuItem.description,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontFamily: 'HelveticaNeue',
-                      fontSize: 15,
+                      fontSize: screenWidth * 0.04,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF858992),
+                      color: const Color(0xFF858992),
                     ),
                   ),
                 ),

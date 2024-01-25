@@ -102,9 +102,9 @@ class _CartListItemState extends State<CartListItem> {
                             children: [
                               Text(
                                 text,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontWeight: FontWeight.w300,
-                                  fontSize: 13,
+                                  fontSize: screenWidth * 0.037,
                                   fontFamily: 'SofiaPro',
                                 ),
                               ),
@@ -147,10 +147,10 @@ class _CartListItemState extends State<CartListItem> {
                       onTap: () {
                         widget.onDelete(item);
                       },
-                      child: const Icon(
+                      child: Icon(
                         Icons.close,
-                        size: 16,
-                        color: Color(0xFFFE724C),
+                        size: screenWidth * 0.042,
+                        color: const Color(0xFFFE724C),
                       ),
                     ),
                     Row(
@@ -159,10 +159,10 @@ class _CartListItemState extends State<CartListItem> {
                           onTap: () {
                             widget.onSub(item);
                           },
-                          child: const Icon(
+                          child: Icon(
                             Icons.remove_circle_outline,
-                            size: 24,
-                            color: Color(0xFFFE724C),
+                            size: screenWidth * 0.07,
+                            color: const Color(0xFFFE724C),
                           ),
                         ),
                         const SizedBox(
@@ -170,8 +170,8 @@ class _CartListItemState extends State<CartListItem> {
                         ),
                         Text(
                           item['item']['quatity'].toString().padLeft(2, '0'),
-                          style: const TextStyle(
-                            fontSize: 15,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.040,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -182,10 +182,10 @@ class _CartListItemState extends State<CartListItem> {
                           onTap: () {
                             widget.onAdd(item);
                           },
-                          child: const Icon(
+                          child: Icon(
                             Icons.add_circle,
-                            size: 24,
-                            color: Color(0xFFFE724C),
+                            size: screenWidth * 0.07,
+                            color: const Color(0xFFFE724C),
                           ),
                         ),
                       ],

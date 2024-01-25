@@ -348,11 +348,11 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                 ),
                 Text(
                   restaurant.name,
-                  style: const TextStyle(
-                    fontSize: 22,
+                  style: TextStyle(
+                    fontSize: screenWidth * 0.061,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'SofiaPro',
-                    color: Color(0xFF111719),
+                    color: const Color(0xFF111719),
                   ),
                 ),
                 SizedBox(
@@ -372,11 +372,11 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                       ),
                       child: Text(
                         tag,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.033,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'SofiaPro',
-                          color: Color(0xFF8A8E9B),
+                          color: const Color(0xFF8A8E9B),
                         ),
                       ),
                     );
@@ -416,11 +416,11 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                                       double.parse(data!['deliveryFee']);
                                   return Text(
                                     '\$${amount.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 13,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.034,
                                       fontWeight: FontWeight.w600,
                                       fontFamily: 'HelveticaNeue',
-                                      color: Color(0xFF7E8392),
+                                      color: const Color(0xFF7E8392),
                                     ),
                                   );
                                 } else {
@@ -451,11 +451,11 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                         alignment: Alignment.centerLeft,
                         child: Text(
                           restaurant.deliveryTime,
-                          style: const TextStyle(
-                            fontSize: 13,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.034,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'HelveticaNeue',
-                            color: Color(0xFF7E8392),
+                            color: const Color(0xFF7E8392),
                           ),
                         ),
                       ),
@@ -473,13 +473,13 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                     alignment: Alignment.centerLeft,
                     child: SizedBox(
                       width: screenWidth * 0.67,
-                      child: const Text(
+                      child: Text(
                         'Featured items',
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: screenWidth * 0.05,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SofiaPro',
-                          color: Color(0xFF323643),
+                          color: const Color(0xFF323643),
                         ),
                       ),
                     ),
@@ -551,7 +551,7 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                           final categories =
                               snapshot.data as List<MenuCategory>;
                           return Container(
-                            height: 50,
+                            height: screenHeight * 0.07,
                             margin: EdgeInsets.only(
                               left: screenWidth * 0.025,
                               right: screenWidth * 0.025,

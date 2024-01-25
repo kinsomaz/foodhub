@@ -269,16 +269,16 @@ class _CartViewState extends State<CartView>
                         height: 50,
                         width: 200,
                         padding: const EdgeInsets.only(left: 7),
-                        child: const TextField(
+                        child: TextField(
                           keyboardType: TextInputType.text,
                           enableSuggestions: false,
                           autocorrect: false,
                           decoration: InputDecoration(
                             hintText: 'Promo Code',
                             hintStyle: TextStyle(
-                              fontSize: 15,
+                              fontSize: screenWidth * 0.040,
                               fontWeight: FontWeight.w400,
-                              color: Color(0xFFBEBEBE),
+                              color: const Color(0xFFBEBEBE),
                             ),
                             border: InputBorder.none,
                           ),
@@ -296,12 +296,12 @@ class _CartViewState extends State<CartView>
                             bottom: 10,
                           ),
                           alignment: Alignment.center,
-                          child: const Text(
+                          child: Text(
                             'Apply',
                             style: TextStyle(
-                                fontSize: 16,
+                                fontSize: screenWidth * 0.042,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFFFFFFFF)),
+                                color: const Color(0xFFFFFFFF)),
                           )),
                     ],
                   ),
@@ -317,10 +317,10 @@ class _CartViewState extends State<CartView>
                       alignment: Alignment.centerLeft,
                       padding:
                           EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                      child: const Text(
+                      child: Text(
                         'Subtotal',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.042,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -357,8 +357,8 @@ class _CartViewState extends State<CartView>
                                   _subTotalController.add(totalPrice);
                                   return Text(
                                     '\$${totalPrice.toStringAsFixed(2)}',
-                                    style: const TextStyle(
-                                      fontSize: 16,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.042,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   );
@@ -377,12 +377,12 @@ class _CartViewState extends State<CartView>
                             right: screenWidth * 0.05,
                             left: 5,
                           ),
-                          child: const Text(
+                          child: Text(
                             'USD',
                             style: TextStyle(
-                                fontSize: 13,
+                                fontSize: screenWidth * 0.036,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9796A1)),
+                                color: const Color(0xFF9796A1)),
                           ),
                         ),
                       ],
@@ -402,10 +402,10 @@ class _CartViewState extends State<CartView>
                       alignment: Alignment.centerLeft,
                       padding:
                           EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                      child: const Text(
+                      child: Text(
                         'Tax and Fees',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.042,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -430,8 +430,8 @@ class _CartViewState extends State<CartView>
                                     _taxFeeController.add(amount);
                                     return Text(
                                       '\$${amount.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.042,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     );
@@ -453,12 +453,12 @@ class _CartViewState extends State<CartView>
                             right: screenWidth * 0.05,
                             left: 5,
                           ),
-                          child: const Text(
+                          child: Text(
                             'USD',
                             style: TextStyle(
-                                fontSize: 13,
+                                fontSize: screenWidth * 0.036,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9796A1)),
+                                color: const Color(0xFF9796A1)),
                           ),
                         ),
                       ],
@@ -478,10 +478,10 @@ class _CartViewState extends State<CartView>
                       alignment: Alignment.centerLeft,
                       padding:
                           EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
-                      child: const Text(
+                      child: Text(
                         'Delivery',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: screenWidth * 0.042,
                           fontWeight: FontWeight.w400,
                         ),
                       ),
@@ -506,8 +506,8 @@ class _CartViewState extends State<CartView>
                                     _deliveryController.add(amount);
                                     return Text(
                                       '\$${amount.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.042,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     );
@@ -529,12 +529,12 @@ class _CartViewState extends State<CartView>
                             right: screenWidth * 0.05,
                             left: 5,
                           ),
-                          child: const Text(
+                          child: Text(
                             'USD',
                             style: TextStyle(
-                                fontSize: 13,
+                                fontSize: screenWidth * 0.036,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9796A1)),
+                                color: const Color(0xFF9796A1)),
                           ),
                         ),
                       ],
@@ -558,10 +558,10 @@ class _CartViewState extends State<CartView>
                             left: screenWidth * 0.05,
                             right: 5,
                           ),
-                          child: const Text(
+                          child: Text(
                             'Total',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: screenWidth * 0.042,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
@@ -581,10 +581,10 @@ class _CartViewState extends State<CartView>
                                       ),
                                       child: Text(
                                         '(${item!.length} items)',
-                                        style: const TextStyle(
-                                            fontSize: 14,
+                                        style: TextStyle(
+                                            fontSize: screenWidth * 0.038,
                                             fontWeight: FontWeight.w400,
-                                            color: Color(0xFFBEBEBE)),
+                                            color: const Color(0xFFBEBEBE)),
                                       ),
                                     );
                                   } else {
@@ -613,8 +613,8 @@ class _CartViewState extends State<CartView>
                                     ),
                                     child: Text(
                                       '\$${total!.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 16,
+                                      style: TextStyle(
+                                        fontSize: screenWidth * 0.042,
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -634,12 +634,12 @@ class _CartViewState extends State<CartView>
                             right: screenWidth * 0.05,
                             left: 5,
                           ),
-                          child: const Text(
+                          child: Text(
                             'USD',
                             style: TextStyle(
-                                fontSize: 13,
+                                fontSize: screenWidth * 0.036,
                                 fontWeight: FontWeight.w400,
-                                color: Color(0xFF9796A1)),
+                                color: const Color(0xFF9796A1)),
                           ),
                         ),
                       ],

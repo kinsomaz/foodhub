@@ -247,11 +247,11 @@ class _MenuItemListViewState extends State<MenuItemListView> {
                       scrollDirection: Axis.horizontal,
                       child: Text(
                         menuItem.name,
-                        style: const TextStyle(
-                          fontSize: 14,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.038,
                           fontWeight: FontWeight.w600,
                           fontFamily: 'SofiaPro',
-                          color: Color(0xFF000000),
+                          color: const Color(0xFF000000),
                         ),
                       ),
                     ),
@@ -270,11 +270,11 @@ class _MenuItemListViewState extends State<MenuItemListView> {
                       scrollDirection: Axis.horizontal,
                       child: Text(
                         menuItem.ingredients,
-                        style: const TextStyle(
-                          fontSize: 13,
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.036,
                           fontWeight: FontWeight.w400,
                           fontFamily: 'HelveticaNeue',
-                          color: Color(0xFF7E8392),
+                          color: const Color(0xFF7E8392),
                         ),
                       ),
                     ),

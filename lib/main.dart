@@ -43,14 +43,18 @@ void main() {
         addressSearchRoute: (context) => const AddressSearchScreen(),
         homeRoute: (context) => const HomeScreenView(),
       },
-      debugShowCheckedModeBanner: false,
     ),
   );
 }
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     context.read<FoodHubBloc>().add(const AuthEventInitialize());

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 Widget buildMenuCategoryLoadingState(double screenHeight, double screenWidth) {
   return Container(
-    height: 50,
+    height: screenHeight * 0.07,
     margin: EdgeInsets.only(
       left: screenWidth * 0.025,
       right: screenWidth * 0.025,
@@ -23,8 +23,8 @@ Widget _buildListItem(double screenHeight, double screenWidth) {
   return Padding(
     padding: EdgeInsets.all(screenWidth * 0.025),
     child: Container(
-      height: 50,
-      width: 70,
+      height: screenHeight * 0.07,
+      width: screenWidth * 0.18,
       padding: const EdgeInsets.symmetric(horizontal: 10),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),

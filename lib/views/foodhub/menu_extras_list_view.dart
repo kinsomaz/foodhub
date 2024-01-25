@@ -22,6 +22,8 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
   @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
     return Wrap(children: [
       Container(
         padding: const EdgeInsets.symmetric(
@@ -30,11 +32,11 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
         ),
         child: Text(
           widget.extra.title,
-          style: const TextStyle(
+          style: TextStyle(
             fontFamily: 'SofiaPro',
-            fontSize: 18,
+            fontSize: screenWidth * 0.044,
             fontWeight: FontWeight.w600,
-            color: Color(0xFF323643),
+            color: const Color(0xFF323643),
           ),
         ),
       ),
@@ -51,7 +53,7 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
             },
             child: Container(
               width: screenWidth,
-              height: 43,
+              height: screenHeight * 0.054,
               alignment: Alignment.topLeft,
               padding: const EdgeInsets.only(
                 left: 10,
@@ -67,8 +69,8 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
                         child: CachedNetworkImage(
                           imageUrl: extra['image'] ?? '',
                           imageBuilder: (context, imageProvider) => Container(
-                            height: 35,
-                            width: 40,
+                            height: screenHeight * 0.05,
+                            width: screenWidth * 0.1,
                             padding: const EdgeInsets.only(
                               right: 4,
                               top: 4,
@@ -80,8 +82,8 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
                             ),
                           ),
                           placeholder: (context, url) => Container(
-                            height: 35,
-                            width: 40,
+                            height: screenHeight * 0.05,
+                            width: screenWidth * 0.1,
                             padding: const EdgeInsets.all(4.0),
                           ),
                         ),
@@ -91,11 +93,11 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
                       ),
                       Text(
                         extra['name'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'HelveticaNeue',
-                          fontSize: 14,
+                          fontSize: screenWidth * 0.038,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF000000),
+                          color: const Color(0xFF000000),
                         ),
                       ),
                     ],
@@ -104,11 +106,11 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
                     children: [
                       Text(
                         extra['price'] ?? '',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'HelveticaNeue',
-                          fontSize: 14,
+                          fontSize: screenWidth * 0.038,
                           fontWeight: FontWeight.w400,
-                          color: Color(0xFF000000),
+                          color: const Color(0xFF000000),
                         ),
                       ),
                       const SizedBox(

@@ -30,11 +30,11 @@ class RestaurantTagListView extends StatelessWidget {
           child: Center(
             child: Text(
               tag,
-              style: const TextStyle(
-                fontSize: 11,
+              style: TextStyle(
+                fontSize: screenWidth * 0.030,
                 fontWeight: FontWeight.w400,
                 fontFamily: 'SofiaPro',
-                color: Color(0xFF8A8E9B),
+                color: const Color(0xFF8A8E9B),
               ),
             ),
           ),

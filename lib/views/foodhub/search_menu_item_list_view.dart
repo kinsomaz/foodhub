@@ -268,11 +268,11 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
                         scrollDirection: Axis.horizontal,
                         child: Text(
                           menuItem.name,
-                          style: const TextStyle(
-                            fontSize: 14,
+                          style: TextStyle(
+                            fontSize: screenWidth * 0.038,
                             fontWeight: FontWeight.w600,
                             fontFamily: 'SofiaPro',
-                            color: Color(0xFF000000),
+                            color: const Color(0xFF000000),
                           ),
                         ),
                       ),
@@ -281,21 +281,24 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
                   SizedBox(
                     height: screenHeight * 0.001,
                   ),
-                  Padding(
-                    padding: EdgeInsets.only(
-                      left: screenWidth * 0.02,
-                    ),
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Text(
-                          menuItem.ingredients,
-                          style: const TextStyle(
-                            fontSize: 13,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: 'HelveticaNeue',
-                            color: Color(0xFF7E8392),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                        left: screenWidth * 0.02,
+                      ),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Text(
+                            menuItem.ingredients,
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.036,
+                              fontWeight: FontWeight.w400,
+                              fontFamily: 'HelveticaNeue',
+                              color: const Color(0xFF7E8392),
+                            ),
                           ),
                         ),
                       ),

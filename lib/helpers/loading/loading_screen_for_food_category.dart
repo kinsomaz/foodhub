@@ -1,19 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/utilities/animations/food_category_animation.dart';
 
-Widget buildFoodCategoryLoadingState(
-    double screenWidth, AnimationController waterFlowController) {
+Widget buildFoodCategoryLoadingState(double screenHeight, double screenWidth) {
   return Container(
-    height: 100,
-    margin: EdgeInsets.only(left: screenWidth * 0.025),
+    height: screenHeight * 0.14,
+    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.025),
     child: SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: Row(
         children: List.generate(6, (index) {
-          return FoodCategoryAnimation(
-            controller: waterFlowController,
-          );
+          return _buildListItem(screenHeight, screenWidth);
         }),
+      ),
+    ),
+  );
+}
+
+Widget _buildListItem(double screenHeight, double screenWidth) {
+  return Padding(
+    padding: const EdgeInsets.all(8.0),
+    child: Container(
+      width: screenWidth * 0.16,
+      height: screenHeight * 0.14,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(25.0),
+        border: Border.all(
+          color: const Color(0xFFEEEEEE),
+        ),
+        color: const Color(0xFFFFFFFF),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            spreadRadius: 1,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
     ),
   );
