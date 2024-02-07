@@ -6,7 +6,9 @@ import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
 import 'package:foodhub/views/foodhub/menu_extra.dart';
 import 'package:foodhub/views/foodhub/menu_item.dart';
+import 'package:foodhub/views/foodhub/order_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/payment/card_information.dart';
 
 abstract class CloudDatabase {
   Future<void> createNewProfile({
@@ -99,6 +101,10 @@ abstract class CloudDatabase {
     required String restaurantName,
   });
 
+  Future<List<Map<String, dynamic>>> getAllCartItems({
+    required String ownerUserId,
+  });
+
   Future<void> addToItemQuantityInCart({
     required Map item,
   });
@@ -119,5 +125,40 @@ abstract class CloudDatabase {
   Stream<Map> getRestaurantFee({
     required String restaurantName,
     required String userId,
+  });
+  Future<void> addNewCard({
+    required String nameOnCard,
+    required String userId,
+    required String cardNumber,
+    required String cvv,
+    required String expiryMonth,
+    required String expiryYear,
+    required String displayName,
+  });
+  Stream<List?> getAllCards({
+    required String userId,
+  });
+  Future<CardInformation> getCardInformation({
+    required String userId,
+    required String lastFourDigit,
+  });
+  Future<void> placeNewOrder({
+    required String userId,
+    required String restaurantName,
+    required String restaurantLogo,
+    required bool isRestaurantVerified,
+    required String orderedTime,
+    required String totalPrice,
+    required String numberOfItems,
+    required List<Map> menuItems,
+  });
+  Stream<List<OrderItem>?> getAllPlacedOrder({
+    required String userId,
+  });
+  Stream<List<OrderItem>?> getUpcomingOrder({
+    required String userId,
+  });
+  Future<Restaurant> getRestaurant({
+    required String restaurantName,
   });
 }

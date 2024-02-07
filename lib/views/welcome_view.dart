@@ -80,7 +80,7 @@ class WelcomeView extends StatelessWidget {
                     child: TextButton(
                       onPressed: () {
                         context.read<FoodHubBloc>().add(
-                              const AuthEventShouldSignIn(),
+                              const AuthEventOnBoard(),
                             );
                       },
                       child: const Text(

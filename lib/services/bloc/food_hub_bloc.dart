@@ -15,6 +15,13 @@ class FoodHubBloc extends Bloc<FoodHubEvent, FoodHubState> {
   final BuildContext context;
   FoodHubBloc(this.provider, this.database, this.context)
       : super(const AuthStateUninitialized(isLoading: true)) {
+    on<AuthEventOnBoard>(
+      (event, emit) {
+        emit(const AuthStateOnBoarding(
+          isLoading: false,
+        ));
+      },
+    );
     // go to the register screen
     on<AuthEventShouldRegister>(
       (event, emit) {

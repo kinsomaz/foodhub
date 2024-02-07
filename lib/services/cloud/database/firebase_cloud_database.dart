@@ -5,6 +5,8 @@ import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/cloud_database.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_database_exception.dart';
+import 'package:foodhub/views/foodhub/order_item.dart';
+import 'package:foodhub/views/payment/card_information.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
 import 'package:foodhub/views/foodhub/menu_category.dart';
 import 'package:foodhub/views/foodhub/menu_extra.dart';
@@ -553,35 +555,30 @@ class FirebaseCloudDatabase implements CloudDatabase {
     required String restaurantName,
   }) {
     final userCart = initialize().collection('userCart');
-    if (restaurantName.isNotEmpty) {
-      final userCartCollection = userCart
-          .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
-          .where('name', isEqualTo: restaurantName)
-          .snapshots();
-      return userCartCollection.map(
-        (event) {
-          if (event.docs.isNotEmpty) {
-            return event.docs.map((doc) => doc.data()).toList();
-          } else {
-            return null;
-          }
-        },
-      );
-    } else {
-      final userCartCollection = userCart
-          .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
-          .snapshots();
+    final userCartCollection = userCart
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .where('name', isEqualTo: restaurantName)
+        .snapshots();
+    return userCartCollection.map(
+      (event) {
+        if (event.docs.isNotEmpty) {
+          return event.docs.map((doc) => doc.data()).toList();
+        } else {
+          return null;
+        }
+      },
+    );
+  }
 
-      return userCartCollection.map(
-        (event) {
-          if (event.docs.isNotEmpty) {
-            return event.docs.map((doc) => doc.data()).toList();
-          } else {
-            return null;
-          }
-        },
-      );
-    }
+  @override
+  Future<List<Map<String, dynamic>>> getAllCartItems(
+      {required String ownerUserId}) async {
+    final userCart = initialize().collection('userCart');
+    final userCartCollection = await userCart
+        .where(ownerUserIdFieldName, isEqualTo: ownerUserId)
+        .get();
+    final cartItems = userCartCollection.docs.map((doc) => doc.data()).toList();
+    return cartItems;
   }
 
   @override
@@ -675,6 +672,147 @@ class FirebaseCloudDatabase implements CloudDatabase {
       final restaurantFee = restaurantData![restaurantName] as Map;
       return restaurantFee;
     });
+  }
+
+  @override
+  Future<void> addNewCard({
+    required String nameOnCard,
+    required String userId,
+    required String cardNumber,
+    required String cvv,
+    required String expiryMonth,
+    required String expiryYear,
+    required String displayName,
+  }) async {
+    final paymentDetailsCollection = initialize().collection('paymentDetails');
+    final documentRef = paymentDetailsCollection.doc(userId);
+    final dataToSet = {
+      'name': nameOnCard,
+      'card_number': cardNumber,
+      'cvv': cvv,
+      'expiry_month': expiryMonth,
+      'expiry_year': expiryYear,
+      'display_name': displayName,
+    };
+    await documentRef.set(
+      {
+        'credit_card': FieldValue.arrayUnion([dataToSet]),
+        'user_id': userId,
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
+  Stream<List<CardInformation>?> getAllCards({
+    required String userId,
+  }) {
+    final paymentDetailsCollection = initialize().collection('paymentDetails');
+    return paymentDetailsCollection.doc(userId).snapshots().map((event) {
+      final cardData = event.data();
+      if (cardData != null) {
+        final cardInformation = cardData['credit_card'] as List;
+        return cardInformation
+            .map((data) => CardInformation.fromDatabase(data))
+            .toList();
+      } else {
+        return null;
+      }
+    });
+  }
+
+  @override
+  Future<CardInformation> getCardInformation({
+    required String userId,
+    required String lastFourDigit,
+  }) async {
+    final paymentDetailsCollection = initialize().collection('paymentDetails');
+    final cardDoc = await paymentDetailsCollection.doc(userId).get();
+    final cardData = cardDoc.data();
+    final cardInformations = cardData!['credit_card'] as List;
+    final datas = cardInformations
+        .map((data) => CardInformation.fromDatabase(data))
+        .toList();
+    final cardInformation = datas.firstWhere((data) {
+      final lastFourDigitOfCardNumber =
+          data.cardNumber.substring(data.cardNumber.length - 4);
+      if (lastFourDigitOfCardNumber == lastFourDigit) {
+        return true;
+      } else {
+        return false;
+      }
+    });
+
+    return cardInformation;
+  }
+
+  @override
+  Future<void> placeNewOrder({
+    required String userId,
+    required String restaurantName,
+    required String restaurantLogo,
+    required bool isRestaurantVerified,
+    required String orderedTime,
+    required String totalPrice,
+    required String numberOfItems,
+    required List<Map> menuItems,
+  }) async {
+    final userOrdersCollection = initialize().collection('userOrders');
+    final documentRef = userOrdersCollection.doc(userId);
+    final dataToSet = {
+      'restaurant_name': restaurantName,
+      'restaurant_logo': restaurantLogo,
+      'ordered_time': orderedTime,
+      'total_price': totalPrice,
+      'number_of_items': numberOfItems,
+      'menu_items': menuItems,
+      'restaurant_is_verified': isRestaurantVerified,
+    };
+
+    await documentRef.set(
+      {
+        'orders': FieldValue.arrayUnion([dataToSet]),
+        'user_id': userId,
+      },
+      SetOptions(merge: true),
+    );
+  }
+
+  @override
+  Stream<List<OrderItem>?> getAllPlacedOrder({
+    required String userId,
+  }) {
+    final userOrdersCollection = initialize().collection('userOrders');
+    return userOrdersCollection.doc(userId).snapshots().map((event) {
+      final orderData = event.data();
+      if (orderData != null) {
+        final orderItem = orderData['orders'] as List;
+        return orderItem.map((data) => OrderItem.fromDatabase(data)).toList();
+      } else {
+        return null;
+      }
+    });
+  }
+
+  @override
+  Stream<List<OrderItem>?> getUpcomingOrder({
+    required String userId,
+  }) {
+    final userUpcomingOrdersCollection = initialize().collection('userOrders');
+    return userUpcomingOrdersCollection.doc(userId).snapshots().map((event) {
+      return null;
+    });
+  }
+
+  @override
+  Future<Restaurant> getRestaurant({
+    required String restaurantName,
+  }) async {
+    final resturantCollection = initialize().collection('restaurant');
+    final snapshot = await resturantCollection
+        .where('name', isEqualTo: restaurantName)
+        .get();
+    return Restaurant.fromSnapshot(snapshot.docs[0]);
   }
 }
 

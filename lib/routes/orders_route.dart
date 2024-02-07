@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/orders_view.dart';
+import 'package:foodhub/views/foodhub/my_orders_screen.dart';
 
 Route ordersRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) => const OrdersView(),
+    pageBuilder: (context, animation, secondaryAnimation) =>
+        const MyOrdersScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;

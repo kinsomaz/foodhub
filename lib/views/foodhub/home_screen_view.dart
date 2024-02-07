@@ -4,15 +4,18 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:foodhub/constants/routes.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_food_category.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_menu_item.dart';
 import 'package:foodhub/helpers/loading/loading_screen_for_restaurant.dart';
+import 'package:foodhub/helpers/loading/loading_screen_with_no_text.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
 import 'package:foodhub/routes/cart_route.dart';
+import 'package:foodhub/routes/delivery_address_route.dart';
 import 'package:foodhub/routes/favourite_route.dart';
 import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/routes/orders_route.dart';
+import 'package:foodhub/routes/payment_method_route.dart';
+import 'package:foodhub/routes/profile_route.dart';
 import 'package:foodhub/routes/restaurant_profile_route.dart';
 import 'package:foodhub/routes/search_food_route.dart';
 import 'package:foodhub/routes/tracking_route.dart';
@@ -21,6 +24,7 @@ import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
+import 'package:foodhub/utilities/dialogs/cart_dialog.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
 import 'package:foodhub/utilities/widget/bottom_navigation_bar.dart';
 import 'package:foodhub/views/foodhub/food_category.dart';
@@ -47,13 +51,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
   late final StreamController<String> _foodCategoryNameController;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   final FocusNode _focusNodeSearch = FocusNode();
-  final List<dynamic> route = [
-    null,
-    () => trackingRoute(),
-    () => cartRoute(arguments: [null]),
-    () => favouriteRoute(),
-    () => ordersRoute(),
-  ];
+  late final List<dynamic> route;
 
   @override
   void initState() {
@@ -66,16 +64,35 @@ class _HomeScreenViewState extends State<HomeScreenView>
         _foodCategoryNameController.sink.add('all');
       },
     );
-    super.initState();
+    route = [
+      null,
+      () => trackingRoute(),
+      () {},
+      () => favouriteRoute(),
+      () => ordersRoute(),
+    ];
     _focusNodeSearch.addListener(() {
       setState(() {});
     });
+    super.initState();
 
     super.initState();
   }
 
   void _onSearchFieldFocus() {
     Navigator.of(context).push(searchFoodRoute());
+  }
+
+  Future<String?> _cartViewRouteProcessing() async {
+    final cartItems = await _cloudServices.getAllCartItems(
+      ownerUserId: _authProvider.currentUser!.uid,
+    );
+    for (var cartItem in cartItems) {
+      if (cartItem['name'] != cartItems.first['name']) {
+        return null;
+      }
+    }
+    return cartItems.first['name'];
   }
 
   @override
@@ -212,7 +229,10 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              scaffoldKey.currentState!.closeDrawer();
+                              Navigator.of(context).push(ordersRoute());
+                            },
                           ),
                           ListTile(
                             leading: Image.asset(
@@ -229,7 +249,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             ),
                             onTap: () {
                               scaffoldKey.currentState!.closeDrawer();
-                              Navigator.of(context).pushNamed(profileRoute);
+                              Navigator.of(context).push(profileRoute());
                             },
                           ),
                           ListTile(
@@ -248,7 +268,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             onTap: () {
                               scaffoldKey.currentState!.closeDrawer();
                               Navigator.of(context)
-                                  .pushNamed(deliveryAddressRoute);
+                                  .push(deliveryAddressRoute());
                             },
                           ),
                           ListTile(
@@ -264,7 +284,12 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            onTap: () {},
+                            onTap: () {
+                              scaffoldKey.currentState!.closeDrawer();
+                              Navigator.of(context).push(
+                                paymentMethodRoute(),
+                              );
+                            },
                           ),
                           ListTile(
                             leading: Image.asset(
@@ -715,8 +740,25 @@ class _HomeScreenViewState extends State<HomeScreenView>
           height: 43,
           child: MyBottomNavigationBar(
             currentIndex: 0,
-            onTap: (index) {
-              if (index != 0) {
+            onTap: (index) async {
+              if (index == 2) {
+                LoadingScreenWithNoText().show(context: context);
+                final restaurantName = await _cartViewRouteProcessing();
+                if (restaurantName == null) {
+                  if (mounted) {
+                    showCartDialog(context);
+                    LoadingScreenWithNoText().hide();
+                  }
+                } else {
+                  final Restaurant restaurant = await _cloudServices
+                      .getRestaurant(restaurantName: restaurantName);
+                  if (mounted) {
+                    LoadingScreenWithNoText().hide();
+                    Navigator.of(context)
+                        .push(cartRoute(arguments: [restaurant]));
+                  }
+                }
+              } else if (index != 0) {
                 Navigator.of(context).push(route[index]()!);
               }
             },

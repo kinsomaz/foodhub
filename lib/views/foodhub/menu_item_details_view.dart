@@ -128,6 +128,22 @@ class _MenuItemDetailsViewState extends State<MenuItemDetailsView>
                           Radius.circular(15),
                         )),
                       ),
+                      errorWidget: (context, url, error) {
+                        return Container(
+                          height: screenHeight * 0.25,
+                          width: screenWidth,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.05,
+                          ),
+                          margin: const EdgeInsets.only(
+                            top: 30,
+                          ),
+                          decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.all(
+                            Radius.circular(15),
+                          )),
+                        );
+                      },
                     ),
                     Positioned(
                       top: 40,

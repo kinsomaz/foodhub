@@ -1,5 +1,3 @@
-const profileRoute = 'ProfileView';
-const deliveryAddressRoute = 'AddNewAddressView';
 const addressSearchRoute = 'AddressSearchScreen';
 const homeRoute = 'HomeScreenView';
 const menuItemDetailsRouteName = 'MenuItemDetailsView';

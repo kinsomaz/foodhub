@@ -78,39 +78,51 @@ class _SearchMenuItemListViewState extends State<SearchMenuItemListView> {
                   Stack(
                     children: [
                       CachedNetworkImage(
-                        imageUrl: imageUrl,
-                        imageBuilder: (context, imageProvider) => Container(
-                          height: screenHeight * 0.19,
-                          width: screenWidth * 0.41,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
-                            ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
-                            ),
-                            child: Image(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                        ),
-                        placeholder: (context, url) => Container(
-                          height: screenHeight * 0.15,
-                          width: screenWidth * 0.41,
-                          decoration: BoxDecoration(
-                            color: Colors.black.withAlpha(10),
-                            borderRadius: const BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
-                            ),
-                          ),
-                        ),
-                      ),
+                          imageUrl: imageUrl,
+                          imageBuilder: (context, imageProvider) => Container(
+                                height: screenHeight * 0.19,
+                                width: screenWidth * 0.41,
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                  ),
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                  ),
+                                  child: Image(
+                                    image: imageProvider,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
+                              ),
+                          placeholder: (context, url) => Container(
+                                height: screenHeight * 0.15,
+                                width: screenWidth * 0.41,
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withAlpha(10),
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(15),
+                                    topRight: Radius.circular(15),
+                                  ),
+                                ),
+                              ),
+                          errorWidget: (context, url, error) {
+                            return Container(
+                              height: screenHeight * 0.15,
+                              width: screenWidth * 0.41,
+                              decoration: BoxDecoration(
+                                color: Colors.black.withAlpha(10),
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(15),
+                                  topRight: Radius.circular(15),
+                                ),
+                              ),
+                            );
+                          }),
                       Positioned(
                         top: 10,
                         left: 10,

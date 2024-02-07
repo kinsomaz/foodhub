@@ -145,6 +145,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.1.6"
+  credit_card_type_detector:
+    dependency: transitive
+    description:
+      name: credit_card_type_detector
+      sha256: f2fb9c7b23fae331d4c5a0dc26437f4c0d4a2306a6c3a5cdb29401f69823070d
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
+  credit_card_validator:
+    dependency: "direct main"
+    description:
+      name: credit_card_validator
+      sha256: e8e6d7250319fd1898340d63c72b1a66817d8abfc6aedcaca76f3633bac515a3
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   cross_file:
     dependency: transitive
     description:
@@ -358,6 +374,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.0.1"
+  flutter_paystack:
+    dependency: "direct main"
+    description:
+      name: flutter_paystack
+      sha256: b2038c8f0cfa5a3bdb7b0e2016ceaedbc57e4445180ce6aea56cb0d83a016973
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.7"
   flutter_plugin_android_lifecycle:
     dependency: transitive
     description:
@@ -384,6 +408,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  font_awesome_flutter:
+    dependency: "direct main"
+    description:
+      name: font_awesome_flutter
+      sha256: "275ff26905134bcb59417cf60ad979136f1f8257f2f449914b2c3e05bbb4cd6f"
+      url: "https://pub.dev"
+    source: hosted
+    version: "10.7.0"
   glob:
     dependency: transitive
     description:
@@ -441,13 +473,13 @@ packages:
     source: hosted
     version: "0.12.2+1"
   http:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: http
-      sha256: "759d1a329847dd0f39226c688d3e06a6b8679668e350e2891a6474f8b4bb8525"
+      sha256: "5895291c13fa8a3bd82e76d5627f69e0d85ca6a30dcac95c4ea19a5d555879c2"
       url: "https://pub.dev"
     source: hosted
-    version: "1.1.0"
+    version: "0.13.6"
   http_parser:
     dependency: transitive
     description:
@@ -521,13 +553,13 @@ packages:
     source: hosted
     version: "0.2.1+1"
   intl:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: intl
-      sha256: "3bc132a9dbce73a7e4a21a17d06e1878839ffbf975568bc875c60537824b0c4d"
+      sha256: "910f85bce16fb5c6f614e117efa303e85a1731bb0081edf3604a2ae6e9a3cc91"
       url: "https://pub.dev"
     source: hosted
-    version: "0.18.1"
+    version: "0.17.0"
   intl_phone_number_input:
     dependency: "direct main"
     description:

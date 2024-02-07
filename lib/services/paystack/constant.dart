@@ -1,0 +1,1 @@
+String paystackPublicKey = 'pk_test_b17e1ef4f2573aad05ad24322e7a78263d6e8736';

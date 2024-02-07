@@ -28,6 +28,11 @@ dependencies:
   async: ^2.11.0
   flutter_svg: ^2.0.9
   rxdart: ^0.27.7
+  flutter_paystack: ^1.0.7
+  http: ^0.13.6
+  credit_card_validator: ^2.1.0
+  font_awesome_flutter: ^10.7.0
+  intl: ^0.17.0
   
   
   
@@ -55,3 +60,4 @@ flutter:
   - family: Phosphate
     fonts:
       - asset: fonts/Phosphate_Pro/Phosphate Pro Cond Inline Regular.otf
+

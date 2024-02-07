@@ -92,6 +92,20 @@ class _PopularItemListViewState extends State<PopularItemListView> {
                           ),
                         ),
                       ),
+                      errorWidget: (context, url, error) {
+                        return Container(
+                          height: screenHeight * 0.15,
+                          width: screenWidth * 0.42,
+                          decoration: BoxDecoration(
+                            color: Colors.black.withAlpha(10),
+                            borderRadius: const BorderRadius.only(
+                              topLeft: Radius.circular(15),
+                              topRight: Radius.circular(15),
+                            ),
+                          ),
+                          child: const Text('failed to load image'),
+                        );
+                      },
                     ),
                     Positioned(
                       top: 10,

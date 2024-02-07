@@ -86,6 +86,13 @@ class _MenuExtraListViewState extends State<MenuExtraListView> {
                             width: screenWidth * 0.1,
                             padding: const EdgeInsets.all(4.0),
                           ),
+                          errorWidget: (context, url, error) {
+                            return Container(
+                              height: screenHeight * 0.05,
+                              width: screenWidth * 0.1,
+                              padding: const EdgeInsets.all(4.0),
+                            );
+                          },
                         ),
                       ),
                       const SizedBox(

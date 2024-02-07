@@ -55,7 +55,7 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
                 color: index == selectedIdx
                     ? const Color(0xFFFE724C)
                     : const Color(0xFFFFFFFF),
-                borderRadius: BorderRadius.circular(25.0),
+                borderRadius: BorderRadius.circular(screenWidth * 0.09),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.1),
@@ -83,6 +83,12 @@ class _FoodCategoryListViewState extends State<FoodCategoryListView> {
                       backgroundColor: Colors.black.withAlpha(10),
                       radius: screenWidth * 0.062,
                     ),
+                    errorWidget: (context, url, error) {
+                      return CircleAvatar(
+                        backgroundColor: Colors.black.withAlpha(10),
+                        radius: screenWidth * 0.062,
+                      );
+                    },
                   ),
                   SizedBox(
                     height: screenHeight * 0.006,

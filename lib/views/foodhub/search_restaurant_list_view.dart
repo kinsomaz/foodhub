@@ -123,6 +123,15 @@ class _SearchRestaurantListViewState extends State<SearchRestaurantListView> {
                                 color: Colors.black.withAlpha(10),
                               ),
                             ),
+                            errorWidget: (context, url, error) {
+                              return Container(
+                                padding: const EdgeInsets.all(10),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.black.withAlpha(10),
+                                ),
+                              );
+                            },
                           ),
                         ),
                         SizedBox(

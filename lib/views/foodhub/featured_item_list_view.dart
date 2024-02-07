@@ -95,6 +95,19 @@ class _FeaturedItemListViewState extends State<FeaturedItemListView> {
                             ),
                           ),
                         ),
+                        errorWidget: (context, url, error) {
+                          return Container(
+                            height: screenHeight * 0.185,
+                            width: screenWidth * 0.7,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(10),
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                            ),
+                            child: const Text('failed to load image'),
+                          );
+                        },
                       ),
                       Positioned(
                         top: 10,

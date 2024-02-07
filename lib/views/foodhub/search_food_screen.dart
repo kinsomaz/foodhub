@@ -272,7 +272,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                               child: SizedBox(
                                 width: 40,
                                 height: 40,
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
                               ),
                             );
                           case ConnectionState.active:
@@ -323,7 +325,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                 child: SizedBox(
                                   width: 40,
                                   height: 40,
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                  ),
                                 ),
                               );
                             }
@@ -332,7 +336,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                               child: SizedBox(
                                 width: 40,
                                 height: 40,
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
                               ),
                             );
                         }
@@ -357,7 +363,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                               child: SizedBox(
                                 width: 40,
                                 height: 40,
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
                               ),
                             );
                           case ConnectionState.active:
@@ -417,7 +425,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                                 child: SizedBox(
                                   width: 40,
                                   height: 40,
-                                  child: CircularProgressIndicator(),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 3,
+                                  ),
                                 ),
                               );
                             }
@@ -426,7 +436,9 @@ class _SearchFoodScreenState extends State<SearchFoodScreen>
                               child: SizedBox(
                                 width: 40,
                                 height: 40,
-                                child: CircularProgressIndicator(),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
                               ),
                             );
                         }

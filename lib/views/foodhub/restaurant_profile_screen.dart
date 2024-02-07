@@ -130,6 +130,24 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                           Radius.circular(15),
                         )),
                       ),
+                      errorWidget: (context, url, error) {
+                        return Container(
+                          height: screenHeight * 0.185,
+                          width: screenWidth,
+                          padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.05,
+                          ),
+                          margin: const EdgeInsets.only(
+                            top: 30,
+                            bottom: 40,
+                          ),
+                          decoration: const BoxDecoration(
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(15),
+                            ),
+                          ),
+                        );
+                      },
                     ),
                     Positioned(
                       bottom: 0,
@@ -163,6 +181,16 @@ class _RestaurantProfileScreenState extends State<RestaurantProfileScreen>
                               color: Colors.black.withAlpha(10),
                             ),
                           ),
+                          errorWidget: (context, url, error) {
+                            return Container(
+                              height: 70,
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.black.withAlpha(10),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ),

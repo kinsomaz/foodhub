@@ -59,6 +59,10 @@ class AuthStateLoggedIn extends FoodHubState {
   });
 }
 
+class AuthStateOnBoarding extends FoodHubState {
+  const AuthStateOnBoarding({required super.isLoading});
+}
+
 class AuthStateEmailNeedsVerification extends FoodHubState {
   final Exception? exception;
 

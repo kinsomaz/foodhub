@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/search_food_screen.dart';
+import 'package:foodhub/views/foodhub/add_new_card_screen.dart';
 
-Route searchFoodRoute() {
+Route addNewCardRoute() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) =>
-        const SearchFoodScreen(),
+        const AddNewCardScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
+      const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
-      const curve = Curves.bounceIn;
+      const curve = Curves.easeInOut;
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 

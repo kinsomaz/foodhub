@@ -83,25 +83,41 @@ class _FeaturedRestaurantListViewState
                     children: [
                       CachedNetworkImage(
                         imageUrl: restaurant.imageUrl,
-                        imageBuilder: (context, imageProvider) => Container(
-                          height: screenHeight * 0.185,
-                          width: screenWidth * 0.7,
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(15),
-                              topRight: Radius.circular(15),
+                        imageBuilder: (context, imageProvider) {
+                          return Container(
+                            height: screenHeight * 0.185,
+                            width: screenWidth * 0.7,
+                            decoration: const BoxDecoration(
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                              ),
                             ),
-                          ),
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.all(
-                              Radius.circular(15),
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(15),
+                              ),
+                              child: Image(
+                                image: imageProvider,
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            child: Image(
-                              image: imageProvider,
-                              fit: BoxFit.cover,
+                          );
+                        },
+                        errorWidget: (context, url, error) {
+                          return Container(
+                            height: screenHeight * 0.185,
+                            width: screenWidth * 0.7,
+                            decoration: BoxDecoration(
+                              color: Colors.black.withAlpha(10),
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(15),
+                                topRight: Radius.circular(15),
+                              ),
                             ),
-                          ),
-                        ),
+                            child: const Text('failed to load image'),
+                          );
+                        },
                         placeholder: (context, url) => Container(
                           height: screenHeight * 0.185,
                           width: screenWidth * 0.7,

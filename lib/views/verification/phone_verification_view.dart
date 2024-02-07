@@ -231,24 +231,55 @@ class _PhoneVerificationViewState extends State<PhoneVerificationView> {
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         onChanged: (value) async {
-          if (value.length == 1 && index < 5) {
-            _focusNodes[index].unfocus();
-            _focusNodes[index + 1].requestFocus();
-          }
-          if (value.length == 1 && index == 5) {
-            context.read<FoodHubBloc>().add(
-                  AuthEventVerifyPhoneCode(
-                    codeOne: _controllers[0].text,
-                    codeTwo: _controllers[1].text,
-                    codeThree: _controllers[2].text,
-                    codeFour: _controllers[3].text,
-                    codeFive: _controllers[4].text,
-                    codeSix: _controllers[5].text,
-                  ),
-                );
+          if (value.length == 1) {
+            _controllers[index].text = value;
+            if (index < 5) {
+              _focusNodes[index].unfocus();
+              _focusNodes[index + 1].requestFocus();
+            } else {
+              _focusNodes[index].unfocus();
+              context.read<FoodHubBloc>().add(
+                    AuthEventVerifyPhoneCode(
+                      codeOne: _controllers[0].text,
+                      codeTwo: _controllers[1].text,
+                      codeThree: _controllers[2].text,
+                      codeFour: _controllers[3].text,
+                      codeFive: _controllers[4].text,
+                      codeSix: _controllers[5].text,
+                    ),
+                  );
+            }
+          } else {
+            if (value.isNotEmpty) {
+              paste(value);
+              if (value.length == 6) {
+                context.read<FoodHubBloc>().add(
+                      AuthEventVerifyPhoneCode(
+                        codeOne: _controllers[0].text,
+                        codeTwo: _controllers[1].text,
+                        codeThree: _controllers[2].text,
+                        codeFour: _controllers[3].text,
+                        codeFive: _controllers[4].text,
+                        codeSix: _controllers[5].text,
+                      ),
+                    );
+              }
+            }
           }
         },
       ),
     );
+  }
+
+  void paste(String value) {
+    for (var i = 0; i < value.length; i++) {
+      if (i < 6) {
+        _controllers[i].text = value[i];
+        if (i < 5) {
+          _focusNodes[i].unfocus();
+          _focusNodes[i + 1].requestFocus();
+        }
+      }
+    }
   }
 }

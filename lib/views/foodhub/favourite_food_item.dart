@@ -35,6 +35,12 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
   }
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
@@ -219,43 +225,187 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
             height: screenHeight * 0.025,
           ),
           Expanded(
-              child: TabBarView(
-            controller: _tabController,
-            children: [
-              Builder(
-                builder: (context) {
-                  return StreamBuilder(
-                    stream: _cloudServices.favouriteMenuItem(
-                      userId: _authProvider.currentUser!.uid,
-                    ),
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return const Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        case ConnectionState.active:
-                          if (snapshot.hasData) {
-                            final data = snapshot.data as List<MenuItem>;
-                            return Container(
-                              margin: EdgeInsets.only(
-                                left: screenWidth * 0.025,
-                                right: screenWidth * 0.025,
-                              ),
-                              child: FavouriteItemListView(
-                                menuitems: data,
-                                onTap: (menuItem) {
-                                  Navigator.of(context).push(
-                                      menuItemDetailsRoute(
-                                          arguments: [menuItem]));
-                                },
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                Builder(
+                  builder: (context) {
+                    return StreamBuilder(
+                      stream: _cloudServices.favouriteMenuItem(
+                        userId: _authProvider.currentUser!.uid,
+                      ),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Center(
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
                               ),
                             );
-                          } else {
+                          case ConnectionState.active:
+                            if (snapshot.hasData) {
+                              final data = snapshot.data as List<MenuItem>;
+                              return Container(
+                                margin: EdgeInsets.only(
+                                  left: screenWidth * 0.025,
+                                  right: screenWidth * 0.025,
+                                ),
+                                child: FavouriteItemListView(
+                                  menuitems: data,
+                                  onTap: (menuItem) {
+                                    Navigator.of(context).push(
+                                        menuItemDetailsRoute(
+                                            arguments: [menuItem]));
+                                  },
+                                ),
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height: screenHeight * 0.15,
+                                  ),
+                                  Icon(
+                                    Icons.assignment,
+                                    size: screenWidth * 0.4,
+                                    color: const Color(0xFFFE724C)
+                                        .withOpacity(0.6),
+                                  ),
+                                  SizedBox(
+                                    height: screenHeight * 0.01,
+                                  ),
+                                  Text(
+                                    'Favourite Empty',
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.05,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'SofiaPro',
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: screenHeight * 0.01,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.05,
+                                    ),
+                                    child: Text(
+                                      'No favourite food items saved yet proceed to choosing a food item as a favourite',
+                                      style: TextStyle(
+                                          fontSize: screenWidth * 0.037,
+                                          fontWeight: FontWeight.w300,
+                                          fontFamily: 'SofiaPro',
+                                          color: const Color(0xFF7F7D92)),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          default:
+                            return const Center(
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            );
+                        }
+                      },
+                    );
+                  },
+                ),
+                Builder(
+                  builder: (context) {
+                    return StreamBuilder(
+                      stream: _cloudServices.favouriteRestaurants(
+                          userId: _authProvider.currentUser!.uid),
+                      builder: (context, snapshot) {
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.waiting:
+                            return const Center(
+                              child: SizedBox(
+                                width: 40,
+                                height: 40,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 3,
+                                ),
+                              ),
+                            );
+                          case ConnectionState.active:
+                            if (snapshot.hasData) {
+                              final data = snapshot.data as List<Restaurant>;
+                              return Container(
+                                margin: EdgeInsets.only(
+                                  left: screenWidth * 0.025,
+                                  right: screenWidth * 0.025,
+                                ),
+                                child: FavouriteRestaurantListView(
+                                  restaurants: data,
+                                  onTap: (restaurant) {
+                                    Navigator.of(context).push(
+                                      restaurantProfileRoute(
+                                          arguments: [restaurant]),
+                                    );
+                                  },
+                                  getRestaurantFee: (String restaurantName) {
+                                    return _cloudServices.getRestaurantFee(
+                                      restaurantName: restaurantName,
+                                      userId: _authProvider.currentUser!.uid,
+                                    );
+                                  },
+                                ),
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  SizedBox(
+                                    height: screenHeight * 0.15,
+                                  ),
+                                  Icon(
+                                    Icons.assignment,
+                                    size: screenWidth * 0.4,
+                                    color: const Color(0xFFFE724C)
+                                        .withOpacity(0.6),
+                                  ),
+                                  SizedBox(
+                                    height: screenHeight * 0.01,
+                                  ),
+                                  Text(
+                                    'Favourite Empty',
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.05,
+                                      fontWeight: FontWeight.w600,
+                                      fontFamily: 'SofiaPro',
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: screenHeight * 0.01,
+                                  ),
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth * 0.05,
+                                    ),
+                                    child: Text(
+                                      'No favourite restaurant saved yet proceed to choosing a restaurant as a favourite',
+                                      style: TextStyle(
+                                          fontSize: screenWidth * 0.037,
+                                          fontWeight: FontWeight.w300,
+                                          fontFamily: 'SofiaPro',
+                                          color: const Color(0xFF7F7D92)),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }
+                          default:
                             return const Center(
                               child: SizedBox(
                                 width: 40,
@@ -263,83 +413,14 @@ class _FavouriteFoodItemViewState extends State<FavouriteFoodItemView>
                                 child: CircularProgressIndicator(),
                               ),
                             );
-                          }
-                        default:
-                          return const Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                      }
-                    },
-                  );
-                },
-              ),
-              Builder(
-                builder: (context) {
-                  return StreamBuilder(
-                    stream: _cloudServices.favouriteRestaurants(
-                        userId: _authProvider.currentUser!.uid),
-                    builder: (context, snapshot) {
-                      switch (snapshot.connectionState) {
-                        case ConnectionState.waiting:
-                          return const Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        case ConnectionState.active:
-                          if (snapshot.hasData) {
-                            final data = snapshot.data as List<Restaurant>;
-                            return Container(
-                              margin: EdgeInsets.only(
-                                left: screenWidth * 0.025,
-                                right: screenWidth * 0.025,
-                              ),
-                              child: FavouriteRestaurantListView(
-                                restaurants: data,
-                                onTap: (restaurant) {
-                                  Navigator.of(context).push(
-                                    restaurantProfileRoute(
-                                        arguments: [restaurant]),
-                                  );
-                                },
-                                getRestaurantFee: (String restaurantName) {
-                                  return _cloudServices.getRestaurantFee(
-                                    restaurantName: restaurantName,
-                                    userId: _authProvider.currentUser!.uid,
-                                  );
-                                },
-                              ),
-                            );
-                          } else {
-                            return const Center(
-                              child: SizedBox(
-                                width: 40,
-                                height: 40,
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          }
-                        default:
-                          return const Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                      }
-                    },
-                  );
-                },
-              )
-            ],
-          ))
+                        }
+                      },
+                    );
+                  },
+                )
+              ],
+            ),
+          ),
         ],
       ),
     );

@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/search_food_screen.dart';
+import 'package:foodhub/views/foodhub/confirmation_screen.dart';
 
-Route searchFoodRoute() {
+Route confirmationRoute({
+  required List<dynamic> arguments,
+}) {
   return PageRouteBuilder(
+    settings: RouteSettings(
+      arguments: arguments,
+    ),
     pageBuilder: (context, animation, secondaryAnimation) =>
-        const SearchFoodScreen(),
+        const ConfirmationScreen(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-      const begin = Offset(0.0, 1.0);
+      const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
-      const curve = Curves.bounceIn;
+      const curve = Curves.easeInOut;
 
       var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 

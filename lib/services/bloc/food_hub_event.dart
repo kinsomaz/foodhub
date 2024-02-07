@@ -10,6 +10,10 @@ class AuthEventInitialize extends FoodHubEvent {
   const AuthEventInitialize();
 }
 
+class AuthEventOnBoard extends FoodHubEvent {
+  const AuthEventOnBoard();
+}
+
 class AuthEventLogIn extends FoodHubEvent {
   final String email;
   final String password;

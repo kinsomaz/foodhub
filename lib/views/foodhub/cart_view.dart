@@ -1,9 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:foodhub/helpers/loading/loading_screen_for_cart_items.dart';
+import 'package:foodhub/routes/confirmation_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
+import 'package:foodhub/utilities/custom_drop_down_item.dart';
 import 'package:foodhub/utilities/dialogs/remove_item_dialog.dart';
+import 'package:foodhub/views/payment/card_information.dart';
 import 'package:foodhub/views/foodhub/cart_list_item.dart';
 import 'package:foodhub/views/foodhub/restaurant.dart';
 import 'package:rxdart/rxdart.dart';
@@ -26,7 +31,11 @@ class _CartViewState extends State<CartView>
   late AnimationController _controller;
   late Animation<Offset> _offsetAnimation;
   late final StreamController<String> _restaurantNameController;
+  late List<Map> menuItem;
+  late String selectedMethod;
+  int? _total;
   int quantity = 0;
+  List<String> methods = ['Bank Transfer', 'Pay with Cash'];
 
   @override
   void initState() {
@@ -57,7 +66,7 @@ class _CartViewState extends State<CartView>
     Future.delayed(const Duration(seconds: 1), () {
       _controller.forward();
     });
-
+    selectedMethod = methods[0];
     super.initState();
   }
 
@@ -88,6 +97,7 @@ class _CartViewState extends State<CartView>
     _subTotalController.close();
     _taxFeeController.close();
     _deliveryController.close();
+    _restaurantNameController.close();
     super.dispose();
   }
 
@@ -155,98 +165,95 @@ class _CartViewState extends State<CartView>
                 SizedBox(
                   height: screenHeight * 0.01,
                 ),
-                StreamBuilder(
-                  stream: _cloudServices.getRestaurantCartItems(
-                    ownerUserId: _authProvider.currentUser!.uid,
-                    restaurantName: restaurant?.name ?? '',
+                Container(
+                  constraints: BoxConstraints(
+                    minHeight: screenHeight * 0.2,
                   ),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case (ConnectionState.waiting):
-                      case (ConnectionState.active):
-                        if (snapshot.hasData) {
-                          final items =
-                              snapshot.data as List<Map<String, dynamic>>;
-                          final restaurantName = _reload(items);
-                          _restaurantNameController.add(restaurantName);
-                          _listOfItemsController.add(items);
-                          return CartListItem(
-                            items: items,
-                            onAdd: (item) async {
-                              await _cloudServices.addToItemQuantityInCart(
-                                item: item,
-                              );
-                            },
-                            onSub: (item) async {
-                              final quatity =
-                                  int.parse(item['item']['quatity'].toString());
-                              if (quatity == 1 && items.length == 1) {
-                                final shouldRemove =
-                                    await showRemoveItemDialog(context);
-                                if (shouldRemove) {
-                                  await _cloudServices
-                                      .subFromItemQuantityInCart(
-                                    item: item,
-                                  );
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.of(context).pop();
-                                }
-                              } else if (quatity == 1) {
-                                final shouldRemove =
-                                    await showRemoveItemDialog(context);
-                                if (shouldRemove) {
-                                  await _cloudServices
-                                      .subFromItemQuantityInCart(
-                                    item: item,
-                                  );
-                                }
-                              } else {
-                                await _cloudServices.subFromItemQuantityInCart(
+                  child: StreamBuilder(
+                    stream: _cloudServices.getRestaurantCartItems(
+                      ownerUserId: _authProvider.currentUser!.uid,
+                      restaurantName: restaurant?.name ?? '',
+                    ),
+                    builder: (context, snapshot) {
+                      switch (snapshot.connectionState) {
+                        case (ConnectionState.waiting):
+                        case (ConnectionState.active):
+                          if (snapshot.hasData) {
+                            final items =
+                                snapshot.data as List<Map<String, dynamic>>;
+                            final restaurantName = _reload(items);
+                            _restaurantNameController.add(restaurantName);
+                            _listOfItemsController.add(items);
+                            menuItem = items;
+                            return CartListItem(
+                              items: items,
+                              onAdd: (item) async {
+                                await _cloudServices.addToItemQuantityInCart(
                                   item: item,
                                 );
-                              }
-                            },
-                            onDelete: (item) async {
-                              if (items.length == 1) {
-                                final shouldRemove =
-                                    await showRemoveItemDialog(context);
-                                if (shouldRemove) {
-                                  await _cloudServices.deleteItemFromCart(
+                              },
+                              onSub: (item) async {
+                                final quatity = int.parse(
+                                    item['item']['quatity'].toString());
+                                if (quatity == 1 && items.length == 1) {
+                                  final shouldRemove =
+                                      await showRemoveItemDialog(context);
+                                  if (shouldRemove) {
+                                    await _cloudServices
+                                        .subFromItemQuantityInCart(
+                                      item: item,
+                                    );
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).pop();
+                                  }
+                                } else if (quatity == 1) {
+                                  final shouldRemove =
+                                      await showRemoveItemDialog(context);
+                                  if (shouldRemove) {
+                                    await _cloudServices
+                                        .subFromItemQuantityInCart(
+                                      item: item,
+                                    );
+                                  }
+                                } else {
+                                  await _cloudServices
+                                      .subFromItemQuantityInCart(
                                     item: item,
                                   );
-                                  // ignore: use_build_context_synchronously
-                                  Navigator.of(context).pop();
                                 }
-                              } else {
-                                final shouldRemove =
-                                    await showRemoveItemDialog(context);
-                                if (shouldRemove) {
-                                  await _cloudServices.deleteItemFromCart(
-                                    item: item,
-                                  );
+                              },
+                              onDelete: (item) async {
+                                if (items.length == 1) {
+                                  final shouldRemove =
+                                      await showRemoveItemDialog(context);
+                                  if (shouldRemove) {
+                                    await _cloudServices.deleteItemFromCart(
+                                      item: item,
+                                    );
+                                    // ignore: use_build_context_synchronously
+                                    Navigator.of(context).pop();
+                                  }
+                                } else {
+                                  final shouldRemove =
+                                      await showRemoveItemDialog(context);
+                                  if (shouldRemove) {
+                                    await _cloudServices.deleteItemFromCart(
+                                      item: item,
+                                    );
+                                  }
                                 }
-                              }
-                            },
-                          );
-                        } else {
-                          return const Center(
-                            child: SizedBox(
-                              width: 40,
-                              height: 40,
-                              child: CircularProgressIndicator(),
-                            ),
-                          );
-                        }
-                      default:
-                        return const Center(
-                          child: SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: CircularProgressIndicator(),
-                          ),
-                        );
-                    }
-                  },
+                              },
+                            );
+                          } else {
+                            return buildCartItemLoadingState(
+                                screenHeight, screenWidth);
+                          }
+                        default:
+                          return buildCartItemLoadingState(
+                              screenHeight, screenWidth);
+                      }
+                    },
+                  ),
                 ),
                 SizedBox(
                   height: screenHeight * 0.02,
@@ -307,7 +314,160 @@ class _CartViewState extends State<CartView>
                   ),
                 ),
                 SizedBox(
-                  height: screenHeight * 0.02,
+                  height: screenHeight * 0.04,
+                ),
+                Padding(
+                  padding: EdgeInsets.only(
+                    left: screenWidth * 0.05,
+                  ),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: SizedBox(
+                      width: screenWidth * 0.67,
+                      child: Text(
+                        'Payment Method',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.057,
+                          fontWeight: FontWeight.w500,
+                          fontFamily: 'SofiaPro',
+                          color: const Color(0xFF323643),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.01,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.05),
+                  child: Material(
+                    elevation: 4,
+                    borderRadius: BorderRadius.circular(10.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
+                      child: Builder(
+                        builder: (BuildContext context) {
+                          return StreamBuilder(
+                            stream: _cloudServices.getAllCards(
+                                userId: _authProvider.currentUser!.uid),
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case (ConnectionState.waiting):
+                                case (ConnectionState.active):
+                                  if (snapshot.hasData) {
+                                    if (snapshot.data != null) {
+                                      final cards = snapshot.data
+                                          as List<CardInformation>;
+                                      for (var card in cards) {
+                                        final String newString =
+                                            'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}';
+                                        if (!methods.contains(newString)) {
+                                          methods.insert(
+                                            0,
+                                            'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}',
+                                          );
+                                        }
+                                      }
+                                      return DropdownButton(
+                                        value: selectedMethod,
+                                        underline: Container(),
+                                        items: methods.map((String value) {
+                                          IconData icon =
+                                              FontAwesomeIcons.ccMastercard;
+                                          if (value == 'Bank Transfer') {
+                                            icon = Icons.account_balance;
+                                          } else if (value == 'Pay with Cash') {
+                                            icon = Icons.attach_money;
+                                          }
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: SizedBox(
+                                              width: screenWidth -
+                                                  screenWidth * 0.17,
+                                              child: CustomDropDownItem(
+                                                label: value,
+                                                icon: icon,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (value) {
+                                          setState(() {
+                                            selectedMethod = value!;
+                                          });
+                                        },
+                                      );
+                                    } else {
+                                      return DropdownButton<String>(
+                                        value: selectedMethod,
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            selectedMethod = newValue!;
+                                          });
+                                        },
+                                        underline: Container(),
+                                        items: methods.map((String value) {
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: SizedBox(
+                                              width: screenWidth -
+                                                  screenWidth * 0.17,
+                                              child: CustomDropDownItem(
+                                                label: value,
+                                                icon: value == 'Bank Transfer'
+                                                    ? Icons.account_balance
+                                                    : Icons.attach_money,
+                                              ),
+                                            ),
+                                          );
+                                        }).toList(),
+                                      );
+                                    }
+                                  } else {
+                                    return Container();
+                                  }
+                                default:
+                                  return DropdownButton<String>(
+                                    value: selectedMethod,
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        selectedMethod = newValue!;
+                                      });
+                                    },
+                                    underline: Container(),
+                                    items: <String>[
+                                      'Bank Transfer',
+                                      'Pay with Cash'
+                                    ].map((String value) {
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: SizedBox(
+                                          width:
+                                              screenWidth - screenWidth * 0.17,
+                                          child: CustomDropDownItem(
+                                            label: value,
+                                            icon: value == 'Bank Transfer'
+                                                ? Icons.account_balance
+                                                : Icons.attach_money,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  );
+                              }
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: screenHeight * 0.04,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -605,6 +765,9 @@ class _CartViewState extends State<CartView>
                               case (ConnectionState.active):
                                 if (snapshot.hasData) {
                                   final total = snapshot.data;
+                                  if (total != null) {
+                                    _total = total.round();
+                                  }
                                   return Container(
                                     height: 40,
                                     alignment: Alignment.centerLeft,
@@ -658,7 +821,20 @@ class _CartViewState extends State<CartView>
           child: SlideTransition(
             position: _offsetAnimation,
             child: GestureDetector(
-              onTap: () {},
+              onTap: () {
+                if (_total != null) {
+                  Navigator.of(context).push(
+                    confirmationRoute(
+                      arguments: [
+                        selectedMethod,
+                        menuItem,
+                        _total,
+                        restaurant,
+                      ],
+                    ),
+                  );
+                }
+              },
               child: Padding(
                 padding: const EdgeInsets.only(
                   left: 80.0,

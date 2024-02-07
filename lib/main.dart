@@ -7,10 +7,9 @@ import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/services/bloc/food_hub_state.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
-import 'package:foodhub/views/foodhub/add_new_address_view.dart';
 import 'package:foodhub/views/foodhub/address_search_body.dart';
 import 'package:foodhub/views/foodhub/home_screen_view.dart';
-import 'package:foodhub/views/foodhub/profile_view.dart';
+import 'package:foodhub/views/foodhub/on_boarding_screen.dart';
 import 'package:foodhub/views/foodhub/splash_screen.dart';
 import 'package:foodhub/views/login_view.dart';
 import 'package:foodhub/views/phone_registration_view.dart';
@@ -38,11 +37,10 @@ void main() {
         child: const HomePage(),
       ),
       routes: {
-        profileRoute: (context) => const ProfileView(),
-        deliveryAddressRoute: (context) => const AddressView(),
         addressSearchRoute: (context) => const AddressSearchScreen(),
         homeRoute: (context) => const HomeScreenView(),
       },
+      debugShowCheckedModeBanner: false,
     ),
   );
 }
@@ -80,6 +78,8 @@ class _HomePageState extends State<HomePage> {
           return const PhoneVerificationView();
         } else if (state is AuthStateLoggedOut) {
           return const WelcomeView();
+        } else if (state is AuthStateOnBoarding) {
+          return const OnboardingScreen();
         } else if (state is AuthStateForgotPassword) {
           return const ResetPasswordView();
         } else if (state is AuthStateRegistering) {
