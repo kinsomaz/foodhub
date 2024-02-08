@@ -33,6 +33,7 @@ dependencies:
   credit_card_validator: ^2.1.0
   font_awesome_flutter: ^10.7.0
   intl: ^0.17.0
+  flutter_launcher_icons: ^0.13.1
   
   
   
