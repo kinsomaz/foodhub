@@ -5,7 +5,7 @@ import 'package:foodhub/services/cloud/database/cloud_database_constants.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/services/cloud/storage/firebase_cloud_storage.dart';
-import 'package:foodhub/views/foodhub/profile_image.dart';
+import 'package:foodhub/views/profile/profile_image.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ProfileView extends StatefulWidget {

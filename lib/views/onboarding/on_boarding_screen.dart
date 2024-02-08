@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_bloc.dart';
 import 'package:foodhub/services/bloc/food_hub_event.dart';
 import 'package:foodhub/utilities/widget/dot_indicator.dart';
-import 'package:foodhub/views/foodhub/onboard_content.dart';
+import 'package:foodhub/views/onboarding/onboard_content.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});

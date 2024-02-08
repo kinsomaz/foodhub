@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/menu_category.dart';
+import 'package:foodhub/views/menu/menu_category.dart';
 
 typedef MenuCategoryCallback = void Function(MenuCategory menuCategory);
 

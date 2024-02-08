@@ -9,8 +9,8 @@ import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/custom_drop_down_item.dart';
 import 'package:foodhub/utilities/dialogs/remove_item_dialog.dart';
 import 'package:foodhub/views/payment/card_information.dart';
-import 'package:foodhub/views/foodhub/cart_list_item.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/cart/cart_list_item.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
 import 'package:rxdart/rxdart.dart';
 
 class CartView extends StatefulWidget {

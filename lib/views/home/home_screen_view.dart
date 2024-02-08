@@ -10,7 +10,6 @@ import 'package:foodhub/helpers/loading/loading_screen_for_restaurant.dart';
 import 'package:foodhub/helpers/loading/loading_screen_with_no_text.dart';
 import 'package:foodhub/icons/custom_search_switch_icon.dart';
 import 'package:foodhub/routes/cart_route.dart';
-import 'package:foodhub/routes/delivery_address_route.dart';
 import 'package:foodhub/routes/favourite_route.dart';
 import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/routes/orders_route.dart';
@@ -27,13 +26,13 @@ import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/dialogs/cart_dialog.dart';
 import 'package:foodhub/utilities/dialogs/logout_dialog.dart';
 import 'package:foodhub/utilities/widget/bottom_navigation_bar.dart';
-import 'package:foodhub/views/foodhub/food_category.dart';
-import 'package:foodhub/views/foodhub/food_category_list_view.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
-import 'package:foodhub/views/foodhub/popular_item_list_view.dart';
-import 'package:foodhub/views/foodhub/profile_image.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
-import 'package:foodhub/views/foodhub/featured_restaurant_list_view.dart';
+import 'package:foodhub/views/home/food_category.dart';
+import 'package:foodhub/views/home/food_category_list_view.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
+import 'package:foodhub/views/home/popular_item_list_view.dart';
+import 'package:foodhub/views/profile/profile_image.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
+import 'package:foodhub/views/home/featured_restaurant_list_view.dart';
 
 class HomeScreenView extends StatefulWidget {
   const HomeScreenView({super.key});
@@ -265,11 +264,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                                 fontWeight: FontWeight.w400,
                               ),
                             ),
-                            onTap: () {
-                              scaffoldKey.currentState!.closeDrawer();
-                              Navigator.of(context)
-                                  .push(deliveryAddressRoute());
-                            },
+                            onTap: () {},
                           ),
                           ListTile(
                             leading: Image.asset(
@@ -453,7 +448,7 @@ class _HomeScreenViewState extends State<HomeScreenView>
                             fontWeight: FontWeight.w400,
                             color: const Color(0xFF9AA0B4),
                           ),
-                          prefixIcon: Icon(Icons.search),
+                          prefixIcon: const Icon(Icons.search),
                           border: InputBorder.none,
                         ),
                         onTap: () {

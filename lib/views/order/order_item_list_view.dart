@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/order_item.dart';
+import 'package:foodhub/views/order/order_item.dart';
 
 class OrderItemListView extends StatefulWidget {
   final Iterable<OrderItem> orderItems;

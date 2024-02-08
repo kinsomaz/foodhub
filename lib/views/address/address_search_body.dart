@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/address_suggestion.dart';
+import 'package:foodhub/views/address/address_suggestion.dart';
 
 class AddressSearchScreen extends StatefulWidget {
   const AddressSearchScreen({super.key});

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/profile_view.dart';
+import 'package:foodhub/views/profile/profile_view.dart';
 
 Route profileRoute() {
   return PageRouteBuilder(

@@ -2,12 +2,12 @@ import 'dart:async';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
-import 'package:foodhub/views/foodhub/food_category.dart';
-import 'package:foodhub/views/foodhub/menu_category.dart';
-import 'package:foodhub/views/foodhub/menu_extra.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
-import 'package:foodhub/views/foodhub/order_item.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/home/food_category.dart';
+import 'package:foodhub/views/menu/menu_category.dart';
+import 'package:foodhub/views/menu/menu_extra.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
+import 'package:foodhub/views/order/order_item.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
 import 'package:foodhub/views/payment/card_information.dart';
 
 abstract class CloudDatabase {

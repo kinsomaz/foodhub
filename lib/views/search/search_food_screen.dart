@@ -4,10 +4,10 @@ import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/routes/restaurant_profile_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
-import 'package:foodhub/views/foodhub/search_menu_item_list_view.dart';
-import 'package:foodhub/views/foodhub/search_restaurant_list_view.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
+import 'package:foodhub/views/search/search_menu_item_list_view.dart';
+import 'package:foodhub/views/search/search_restaurant_list_view.dart';
 import 'package:rxdart/rxdart.dart';
 
 class SearchFoodScreen extends StatefulWidget {

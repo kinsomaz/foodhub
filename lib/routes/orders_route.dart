@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/my_orders_screen.dart';
+import 'package:foodhub/views/order/my_orders_screen.dart';
 
 Route ordersRoute() {
   return PageRouteBuilder(

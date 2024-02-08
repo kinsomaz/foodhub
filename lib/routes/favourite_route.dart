@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/constants/routes.dart';
-import 'package:foodhub/views/foodhub/favourite_food_item.dart';
+import 'package:foodhub/views/favourite/favourite_food_item.dart';
 
 Route favouriteRoute() {
   return PageRouteBuilder(

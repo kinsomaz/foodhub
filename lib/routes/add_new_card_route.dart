@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/add_new_card_screen.dart';
+import 'package:foodhub/views/payment/add_new_card_screen.dart';
 
 Route addNewCardRoute() {
   return PageRouteBuilder(

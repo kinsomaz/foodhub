@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/constants/routes.dart';
-import 'package:foodhub/views/foodhub/menu_item_details_view.dart';
+import 'package:foodhub/views/menu/menu_item_details_view.dart';
 
 Route menuItemDetailsRoute({
   required List<dynamic> arguments,

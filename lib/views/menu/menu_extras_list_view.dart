@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/menu_extra.dart';
+import 'package:foodhub/views/menu/menu_extra.dart';
 
 typedef ExtraSelected = void Function(int selectedInt);
 

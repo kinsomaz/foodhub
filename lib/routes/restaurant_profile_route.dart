@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:foodhub/constants/routes.dart';
-import 'package:foodhub/views/foodhub/restaurant_profile_screen.dart';
+import 'package:foodhub/views/restaurant/restaurant_profile_screen.dart';
 
 Route restaurantProfileRoute({
   required List<dynamic> arguments,

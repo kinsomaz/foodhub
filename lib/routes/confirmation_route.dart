@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/confirmation_screen.dart';
+import 'package:foodhub/views/payment/confirmation_screen.dart';
 
 Route confirmationRoute({
   required List<dynamic> arguments,

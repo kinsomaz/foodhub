@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/cart_view.dart';
+import 'package:foodhub/views/cart/cart_view.dart';
 
 Route cartRoute({
   required List<dynamic> arguments,

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/cloud_profile.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
-import 'package:foodhub/views/foodhub/order_item.dart';
-import 'package:foodhub/views/foodhub/order_item_list_view.dart';
+import 'package:foodhub/views/order/order_item.dart';
+import 'package:foodhub/views/order/order_item_list_view.dart';
 
 class MyOrdersScreen extends StatefulWidget {
   const MyOrdersScreen({super.key});

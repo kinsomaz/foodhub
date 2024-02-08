@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/food_category.dart';
+import 'package:foodhub/views/home/food_category.dart';
 
 typedef FoodCategoryCallback = void Function(FoodCategory foodCategory);
 typedef FoodCategorySecondCallback = void Function();

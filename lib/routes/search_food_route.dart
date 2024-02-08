@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/search_food_screen.dart';
+import 'package:foodhub/views/search/search_food_screen.dart';
 
 Route searchFoodRoute() {
   return PageRouteBuilder(

@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:foodhub/icons/custom_delivery_clock_icon.dart';
 import 'package:foodhub/icons/custom_delivery_icon.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
 
 typedef SearchedRestaurantCallback = void Function(Restaurant restaurant);
 

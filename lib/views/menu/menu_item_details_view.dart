@@ -5,9 +5,9 @@ import 'package:foodhub/helpers/loading/loading_screen_for_add_on.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/animations/custom_cart_buttom.dart';
-import 'package:foodhub/views/foodhub/menu_extra.dart';
-import 'package:foodhub/views/foodhub/menu_extras_list_view.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
+import 'package:foodhub/views/menu/menu_extra.dart';
+import 'package:foodhub/views/menu/menu_extras_list_view.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
 
 class MenuItemDetailsView extends StatefulWidget {
   const MenuItemDetailsView({super.key});

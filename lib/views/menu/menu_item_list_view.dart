@@ -1,7 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/featured_item_list_view.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
+import 'package:foodhub/views/restaurant/featured_item_list_view.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
 
 typedef MenuItemCallback = void Function(MenuItem menuItem);
 typedef IsFoodItemFavouriteCallback = Stream<bool> Function(

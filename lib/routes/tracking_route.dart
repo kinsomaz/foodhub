@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/tracking_view.dart';
+import 'package:foodhub/views/tracking/tracking_view.dart';
 
 Route trackingRoute() {
   return PageRouteBuilder(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/foodhub/add_new_address_view.dart';
+import 'package:foodhub/views/address/add_new_address_view.dart';
 
 Route deliveryAddressRoute() {
   return PageRouteBuilder(

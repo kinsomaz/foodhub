@@ -11,12 +11,12 @@ import 'package:foodhub/routes/cart_route.dart';
 import 'package:foodhub/routes/menu_item_details_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
-import 'package:foodhub/views/foodhub/featured_item_list_view.dart';
-import 'package:foodhub/views/foodhub/menu_category.dart';
-import 'package:foodhub/views/foodhub/menu_category_list_view.dart';
-import 'package:foodhub/views/foodhub/menu_item.dart';
-import 'package:foodhub/views/foodhub/menu_item_list_view.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/restaurant/featured_item_list_view.dart';
+import 'package:foodhub/views/menu/menu_category.dart';
+import 'package:foodhub/views/menu/menu_category_list_view.dart';
+import 'package:foodhub/views/menu/menu_item.dart';
+import 'package:foodhub/views/menu/menu_item_list_view.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
 
 class RestaurantProfileScreen extends StatefulWidget {
   const RestaurantProfileScreen({

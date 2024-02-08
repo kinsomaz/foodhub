@@ -6,7 +6,7 @@ import 'package:foodhub/routes/payment_success_route.dart';
 import 'package:foodhub/services/auth/firebase_auth_provider.dart';
 import 'package:foodhub/services/cloud/database/firebase_cloud_database.dart';
 import 'package:foodhub/utilities/zigzag.dart';
-import 'package:foodhub/views/foodhub/restaurant.dart';
+import 'package:foodhub/views/restaurant/restaurant.dart';
 import 'package:foodhub/views/payment/card_processing_screen.dart';
 import 'package:foodhub/views/payment/transfer_processing_screen.dart';
 import 'package:intl/intl.dart';
