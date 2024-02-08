@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:foodhub/views/address/add_new_address_view.dart';
 
 Route deliveryAddressRoute() {
   return PageRouteBuilder(
-    pageBuilder: (context, animation, secondaryAnimation) =>
-        const AddressView(),
+    pageBuilder: (context, animation, secondaryAnimation) => const Scaffold(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       const begin = Offset(1.0, 0.0);
       const end = Offset.zero;
