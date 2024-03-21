@@ -1,10 +1,10 @@
 name: foodhub
-description: A new Flutter project.
+description: Basically, this is a demo version of a food delivery app. This is the first release of the app for testers.
 publish_to: 'none' 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
-  sdk: '>=3.1.0 <4.0.0'
+  sdk: '>=2.18.0 <4.0.0'
 
 dependencies:
   flutter:

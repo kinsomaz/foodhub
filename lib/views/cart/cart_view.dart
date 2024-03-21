@@ -359,76 +359,72 @@ class _CartViewState extends State<CartView>
                                 case (ConnectionState.waiting):
                                 case (ConnectionState.active):
                                   if (snapshot.hasData) {
-                                    if (snapshot.data != null) {
-                                      final cards = snapshot.data
-                                          as List<CardInformation>;
-                                      for (var card in cards) {
-                                        final String newString =
-                                            'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}';
-                                        if (!methods.contains(newString)) {
-                                          methods.insert(
-                                            0,
-                                            'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}',
-                                          );
-                                        }
+                                    final cards =
+                                        snapshot.data as List<CardInformation>;
+                                    for (var card in cards) {
+                                      final String newString =
+                                          'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}';
+                                      if (!methods.contains(newString)) {
+                                        methods.insert(
+                                          0,
+                                          'Card ending in ${card.cardNumber.substring(card.cardNumber.length - 4)}',
+                                        );
                                       }
-                                      return DropdownButton(
-                                        value: selectedMethod,
-                                        underline: Container(),
-                                        items: methods.map((String value) {
-                                          IconData icon =
-                                              FontAwesomeIcons.ccMastercard;
-                                          if (value == 'Bank Transfer') {
-                                            icon = Icons.account_balance;
-                                          } else if (value == 'Pay with Cash') {
-                                            icon = Icons.attach_money;
-                                          }
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: SizedBox(
-                                              width: screenWidth -
-                                                  screenWidth * 0.17,
-                                              child: CustomDropDownItem(
-                                                label: value,
-                                                icon: icon,
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                        onChanged: (value) {
-                                          setState(() {
-                                            selectedMethod = value!;
-                                          });
-                                        },
-                                      );
-                                    } else {
-                                      return DropdownButton<String>(
-                                        value: selectedMethod,
-                                        onChanged: (String? newValue) {
-                                          setState(() {
-                                            selectedMethod = newValue!;
-                                          });
-                                        },
-                                        underline: Container(),
-                                        items: methods.map((String value) {
-                                          return DropdownMenuItem<String>(
-                                            value: value,
-                                            child: SizedBox(
-                                              width: screenWidth -
-                                                  screenWidth * 0.17,
-                                              child: CustomDropDownItem(
-                                                label: value,
-                                                icon: value == 'Bank Transfer'
-                                                    ? Icons.account_balance
-                                                    : Icons.attach_money,
-                                              ),
-                                            ),
-                                          );
-                                        }).toList(),
-                                      );
                                     }
+                                    return DropdownButton(
+                                      value: selectedMethod,
+                                      underline: Container(),
+                                      items: methods.map((String value) {
+                                        IconData icon =
+                                            FontAwesomeIcons.ccMastercard;
+                                        if (value == 'Bank Transfer') {
+                                          icon = Icons.account_balance;
+                                        } else if (value == 'Pay with Cash') {
+                                          icon = Icons.attach_money;
+                                        }
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: SizedBox(
+                                            width: screenWidth -
+                                                screenWidth * 0.17,
+                                            child: CustomDropDownItem(
+                                              label: value,
+                                              icon: icon,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedMethod = value!;
+                                        });
+                                      },
+                                    );
                                   } else {
-                                    return Container();
+                                    return DropdownButton<String>(
+                                      value: selectedMethod,
+                                      onChanged: (String? newValue) {
+                                        setState(() {
+                                          selectedMethod = newValue!;
+                                        });
+                                      },
+                                      underline: Container(),
+                                      items: methods.map((String value) {
+                                        return DropdownMenuItem<String>(
+                                          value: value,
+                                          child: SizedBox(
+                                            width: screenWidth -
+                                                screenWidth * 0.17,
+                                            child: CustomDropDownItem(
+                                              label: value,
+                                              icon: value == 'Bank Transfer'
+                                                  ? Icons.account_balance
+                                                  : Icons.attach_money,
+                                            ),
+                                          ),
+                                        );
+                                      }).toList(),
+                                    );
                                   }
                                 default:
                                   return DropdownButton<String>(
